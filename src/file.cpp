@@ -47,6 +47,15 @@ File::~File() {
     delete pImpl;
 }
 
+bool File::exists(const std::string& filename) {
+    std::ifstream file(filename);
+    return file.is_open();
+}
+
+bool File::isOpen() const {
+    return pImpl->inFile.is_open() || pImpl->outFile.is_open();
+}
+
 std::string File::readAll() {
     if (!pImpl->inFile.is_open()) {
         throw std::runtime_error("File not open for reading");

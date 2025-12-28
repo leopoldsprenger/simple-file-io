@@ -1,5 +1,6 @@
 #include "SimpleFileIO/File.h"
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 
 using SimpleFileIO::Mode;
@@ -47,6 +48,10 @@ File::~File() {
 }
 
 std::string File::readAll() {
+    if (!pImpl->inFile.is_open()) {
+        throw std::runtime_error("File not open for reading");
+    }
+    
     try {
         std::string data((std::istreambuf_iterator<char>(pImpl->inFile)),
                          std::istreambuf_iterator<char>());
@@ -57,6 +62,10 @@ std::string File::readAll() {
 }
 
 std::vector<std::string> File::readLines(int numLines) {
+    if (!pImpl->inFile.is_open()) {
+        throw std::runtime_error("File not open for reading");
+    }
+
     std::vector<std::string> lines;
     std::string line;
 
@@ -69,13 +78,39 @@ std::vector<std::string> File::readLines(int numLines) {
             if (numLines > 0 && ++count >= numLines) break;
         }
     } catch (const std::ios_base::failure& e) {
-        throw std::runtime_error("Error reading file: " + std::string(e.what()));
+        throw std::runtime_error("Error reading lines: " + std::string(e.what()));
     }
 
     pImpl->inFile.clear();
     pImpl->inFile.seekg(0);
 
     return lines;
+}
+
+void File::writeAll(const std::string& data) {
+    if (!pImpl->outFile.is_open()) {
+        throw std::runtime_error("File not open for writing");
+    }
+
+    try {
+        pImpl->outFile << data;
+    } catch (const std::ios_base::failure& e) {
+        throw std::runtime_error("Error writing file: " + std::string(e.what()));
+    }
+}
+
+void File::writeLines(const std::vector<std::string>& lines) {
+    if (!pImpl->outFile.is_open()) {
+        throw std::runtime_error("File not open for writing");
+    }
+
+    try {
+        std::ostringstream buffer;
+        for (const auto& line : lines) buffer << line << '\n';
+        pImpl->outFile << buffer.str();
+    } catch (const std::ios_base::failure& e) {
+        throw std::runtime_error("Error writing lines: " + std::string(e.what()));
+    }
 }
 
 }

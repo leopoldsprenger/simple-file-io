@@ -61,6 +61,26 @@ std::string File::readAll() {
     }
 }
 
+std::string File::readLine() {
+    if (!pImpl->inFile.is_open()) {
+        throw std::runtime_error("File not open for reading");
+    }
+
+    std::string line;
+    try {
+        if (std::getline(pImpl->inFile, line)) {
+            return line;
+        } else if (pImpl->inFile.eof()) {
+            pImpl->inFile.clear();
+            throw std::runtime_error("End of file reached");
+        } else {
+            throw std::runtime_error("Error reading line from file");
+        }
+    } catch (const std::ios_base::failure& e) {
+        throw std::runtime_error("File read failure: " + std::string(e.what()));
+    }
+}
+
 std::vector<std::string> File::readLines(int numLines) {
     if (!pImpl->inFile.is_open()) {
         throw std::runtime_error("File not open for reading");
@@ -96,6 +116,18 @@ void File::writeAll(const std::string& data) {
         pImpl->outFile << data;
     } catch (const std::ios_base::failure& e) {
         throw std::runtime_error("Error writing file: " + std::string(e.what()));
+    }
+}
+
+void File::writeLine(const std::string& line) {
+    if (!pImpl->outFile.is_open()) {
+        throw std::runtime_error("File not open for writing");
+    }
+
+    try {
+        pImpl->outFile << line << '\n';
+    } catch (const std::ios_base::failure& e) {
+        throw std::runtime_error("Error writing line to file: " + std::string(e.what()));
     }
 }
 

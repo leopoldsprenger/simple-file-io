@@ -46,4 +46,36 @@ File::~File() {
     delete pImpl;
 }
 
+std::string File::readAll() {
+    try {
+        std::string data((std::istreambuf_iterator<char>(pImpl->inFile)),
+                         std::istreambuf_iterator<char>());
+        return data;
+    } catch (const std::ios_base::failure& e) {
+        throw std::runtime_error("Error reading file: " + std::string(e.what()));
+    }
+}
+
+std::vector<std::string> File::readLines(int numLines) {
+    std::vector<std::string> lines;
+    std::string line;
+
+    if (numLines > 0) lines.reserve(numLines);
+
+    try {
+        int count = 0;
+        while (std::getline(pImpl->inFile, line)) {
+            lines.push_back(line);
+            if (numLines > 0 && ++count >= numLines) break;
+        }
+    } catch (const std::ios_base::failure& e) {
+        throw std::runtime_error("Error reading file: " + std::string(e.what()));
+    }
+
+    pImpl->inFile.clear();
+    pImpl->inFile.seekg(0);
+
+    return lines;
+}
+
 }

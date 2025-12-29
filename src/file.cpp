@@ -103,6 +103,8 @@ std::string File::readAll() {
 std::string File::readLine() {
     if (!has(pImpl->mode, OpenMode::Read))
         throw std::runtime_error("File not opened in read mode");
+    if (has(pImpl->mode, OpenMode::Binary))
+        throw std::runtime_error("readLine() not supported in binary mode");
 
     try {
         std::string line;
@@ -159,6 +161,8 @@ void File::writeAll(const std::string& data) {
 void File::writeLine(const std::string& line) {
     if (!has(pImpl->mode, OpenMode::Write) && !has(pImpl->mode, OpenMode::Append))
         throw std::runtime_error("File not opened in write/append mode");
+    if (has(pImpl->mode, OpenMode::Binary))
+        throw std::runtime_error("writeLine() not supported in binary mode");
 
     try {
         pImpl->outFile << line << '\n';

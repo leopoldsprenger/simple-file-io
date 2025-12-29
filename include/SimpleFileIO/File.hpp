@@ -8,6 +8,7 @@
 #include <cstdint>
 
 namespace SimpleFileIO {
+    // Bitmask flags for opening modes
     enum class OpenMode : uint8_t {
         None   = 0,
         Read   = 1 << 0,
@@ -20,6 +21,7 @@ namespace SimpleFileIO {
         return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
     }
 
+    // Bitwise operators for OpenMode flags
     inline OpenMode operator|(OpenMode a, OpenMode b) {
         return static_cast<OpenMode>(
             static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
@@ -48,10 +50,6 @@ namespace SimpleFileIO {
         inline void writeLine(const std::string& line);
         inline void writeLines(const std::vector<std::string>& lines);
 
-        inline void append(const std::string& data);
-        inline void appendLine(const std::string& line);
-        inline void appendLines(const std::vector<std::string>& lines);
-
     private:
         struct Impl;
         Impl* pImpl;
@@ -69,6 +67,7 @@ namespace SimpleFileIO {
             if (mode == OpenMode::None)
                 throw std::logic_error("No mode specified");
 
+            // Ensure exactly one of Read/Write/Append is set
             int access_count =
                 (has(mode, OpenMode::Read)   ? 1 : 0) +
                 (has(mode, OpenMode::Write)  ? 1 : 0) +
@@ -86,10 +85,11 @@ namespace SimpleFileIO {
             if (has(mode, OpenMode::Append)) flags |= std::ios::out | std::ios::app;
             if (has(mode, OpenMode::Binary)) flags |= std::ios::binary;
 
+            // Open the file with proper flags and enable exceptions
             try {
                 if (has(mode, OpenMode::Read)) {
                     inFile.open(path, flags);
-                    inFile.exceptions(std::ios::badbit);
+                    inFile.exceptions(std::ios::badbit); // only throw on badbit
                 } else {
                     outFile.open(path, flags);
                     outFile.exceptions(std::ios::failbit | std::ios::badbit);
@@ -108,7 +108,7 @@ namespace SimpleFileIO {
     inline File::~File() {
         if (pImpl) {
             if (pImpl->outFile.is_open()) {
-                pImpl->outFile.flush();
+                pImpl->outFile.flush(); // ensure data is written
                 pImpl->outFile.close();
             }
             if (pImpl->inFile.is_open()) {
@@ -120,7 +120,7 @@ namespace SimpleFileIO {
 
     inline bool File::exists(const std::string& path) {
         std::ifstream file(path);
-        return file.is_open();
+        return file.is_open(); // simple existence check
     }
 
     inline bool File::isOpen() const {
@@ -133,7 +133,7 @@ namespace SimpleFileIO {
 
         try {
             std::ostringstream buffer;
-            buffer << pImpl->inFile.rdbuf();
+            buffer << pImpl->inFile.rdbuf(); // read full file into string
             return buffer.str();
         } catch (const std::ios_base::failure& e) {
             throw std::runtime_error(
@@ -153,7 +153,7 @@ namespace SimpleFileIO {
             if (std::getline(pImpl->inFile, line))
                 return line;
 
-            throw std::out_of_range("End of file reached");
+            throw std::out_of_range("End of file reached"); // EOF reached
         } catch (const std::ios_base::failure& e) {
             throw std::runtime_error(
                 "Error reading line from '" + pImpl->path + "': " + e.what()
@@ -169,21 +169,14 @@ namespace SimpleFileIO {
         if (numLines > 0) lines.reserve(numLines);
 
         try {
-            std::string line;
-            int count = 0;
-
-            while (std::getline(pImpl->inFile, line)) {
-                lines.push_back(line);
-                if (numLines > 0 && ++count >= numLines)
-                    break;
+            for (int i = 0; numLines == 0 || i < numLines; ++i) {
+                lines.push_back(readLine()); // readLine() throws std::out_of_range at EOF
             }
-
-            return lines;
-        } catch (const std::ios_base::failure& e) {
-            throw std::runtime_error(
-                "Error reading lines from '" + pImpl->path + "': " + e.what()
-            );
+        } catch (const std::out_of_range&) {
+            // EOF reached, stop reading
         }
+
+        return lines;
     }
 
     inline void File::writeAll(const std::string& data) {
@@ -193,7 +186,7 @@ namespace SimpleFileIO {
 
         try {
             pImpl->outFile << data;
-            pImpl->outFile.flush();
+            pImpl->outFile.flush(); // ensure data is written
         } catch (const std::ios_base::failure& e) {
             throw std::runtime_error(
                 "Error writing to '" + pImpl->path + "': " + e.what()
@@ -219,18 +212,7 @@ namespace SimpleFileIO {
     }
 
     inline void File::writeLines(const std::vector<std::string>& lines) {
-        if (!has(pImpl->mode, OpenMode::Write) &&
-            !has(pImpl->mode, OpenMode::Append))
-            throw std::runtime_error("File not opened in write/append mode");
-
-        try {
-            for (const auto& line : lines)
-                pImpl->outFile << line << '\n';
-            pImpl->outFile.flush();
-        } catch (const std::ios_base::failure& e) {
-            throw std::runtime_error(
-                "Error writing lines to '" + pImpl->path + "': " + e.what()
-            );
-        }
+        for (const auto& line : lines)
+            writeLine(line);
     }
 }

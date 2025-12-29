@@ -107,7 +107,7 @@ appender.writeLine("This line is appended");
 ### Binary mode example
 ```cpp
 File binaryFile("data.bin", OpenMode::Write | OpenMode::Binary);
-std::vector<char> binaryData = {0x01, 0x02, 0x03, 0xFF};
+std::vector<char> binaryData = {0x01, 0x02, 0x03, (char)0xFF};
 binaryFile.writeBytes(binaryData);
 
 File binaryReader("data.bin", OpenMode::Read | OpenMode::Binary);

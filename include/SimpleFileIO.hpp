@@ -6,6 +6,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <cstdint>
+#include <cstddef>
+#include <cstring>
 
 namespace SimpleFileIO {
     // Bitmask flags for opening modes
@@ -42,17 +44,25 @@ namespace SimpleFileIO {
         inline bool isOpen() const;
         inline static bool exists(const std::string& path);
 
-        inline std::string readAll();
+        inline std::string readString();
         inline std::string readLine();
         inline std::vector<std::string> readLines(int numLines = 0);
 
-        inline void writeAll(const std::string& data);
+        inline void writeString(const std::string& data);
         inline void writeLine(const std::string& line);
         inline void writeLines(const std::vector<std::string>& lines);
+
+        // User-facing functions: char-based
+        inline std::vector<char> readBytes();
+        inline void writeBytes(const std::vector<char>& data);
 
     private:
         struct Impl;
         Impl* pImpl;
+
+        // Internal std::byte-based core
+        inline std::vector<std::byte> readBytesInternal();
+        inline void writeBytesInternal(const std::vector<std::byte>& data);
     };
 
     struct File::Impl {
@@ -127,9 +137,11 @@ namespace SimpleFileIO {
         return pImpl->inFile.is_open() || pImpl->outFile.is_open();
     }
 
-    inline std::string File::readAll() {
+    inline std::string File::readString() {
         if (!has(pImpl->mode, OpenMode::Read))
             throw std::runtime_error("File not opened in read mode");
+        if (has(pImpl->mode, OpenMode::Binary))
+            throw std::runtime_error("readString() not supported in binary mode");
 
         try {
             std::ostringstream buffer;
@@ -137,7 +149,7 @@ namespace SimpleFileIO {
             return buffer.str();
         } catch (const std::ios_base::failure& e) {
             throw std::runtime_error(
-                "Error reading file '" + pImpl->path + "': " + e.what()
+                "Error reading text file '" + pImpl->path + "': " + e.what()
             );
         }
     }
@@ -164,6 +176,8 @@ namespace SimpleFileIO {
     inline std::vector<std::string> File::readLines(int numLines) {
         if (!has(pImpl->mode, OpenMode::Read))
             throw std::runtime_error("File not opened in read mode");
+        if (has(pImpl->mode, OpenMode::Binary))
+            throw std::runtime_error("readLines() not supported in binary mode");
 
         std::vector<std::string> lines;
         if (numLines > 0) lines.reserve(numLines);
@@ -179,17 +193,19 @@ namespace SimpleFileIO {
         return lines;
     }
 
-    inline void File::writeAll(const std::string& data) {
+    inline void File::writeString(const std::string& data) {
         if (!has(pImpl->mode, OpenMode::Write) &&
             !has(pImpl->mode, OpenMode::Append))
             throw std::runtime_error("File not opened in write/append mode");
+        if (has(pImpl->mode, OpenMode::Binary))
+            throw std::runtime_error("writeString() not supported in binary mode");
 
         try {
             pImpl->outFile << data;
             pImpl->outFile.flush(); // ensure data is written
         } catch (const std::ios_base::failure& e) {
             throw std::runtime_error(
-                "Error writing to '" + pImpl->path + "': " + e.what()
+                "Error writing text to '" + pImpl->path + "': " + e.what()
             );
         }
     }
@@ -215,4 +231,52 @@ namespace SimpleFileIO {
         for (const auto& line : lines)
             writeLine(line);
     }
+
+    inline std::vector<std::byte> File::readBytesInternal() {
+        if (!has(pImpl->mode, OpenMode::Read))
+            throw std::runtime_error("File not opened in read mode");
+        if (!has(pImpl->mode, OpenMode::Binary))
+            throw std::runtime_error("readBytes() requires binary mode");
+
+        pImpl->inFile.clear();
+        pImpl->inFile.seekg(0, std::ios::beg);
+
+        // Read into a vector<char> first
+        std::vector<char> buffer(
+            (std::istreambuf_iterator<char>(pImpl->inFile)),
+            std::istreambuf_iterator<char>()
+        );
+
+        // Convert to vector<std::byte>
+        std::vector<std::byte> bytes(buffer.size());
+        std::memcpy(bytes.data(), buffer.data(), buffer.size());
+
+        return bytes;
+    }
+
+    inline void File::writeBytesInternal(const std::vector<std::byte>& data) {
+        if (!has(pImpl->mode, OpenMode::Write) && !has(pImpl->mode, OpenMode::Append))
+            throw std::runtime_error("File not opened in write/append mode");
+        if (!has(pImpl->mode, OpenMode::Binary))
+            throw std::runtime_error("writeBytes() requires binary mode");
+
+        pImpl->outFile.write(reinterpret_cast<const char*>(data.data()), data.size());
+        pImpl->outFile.flush();
+    }
+
+    inline std::vector<char> File::readBytes() {
+        auto bytes = readBytesInternal(); // std::byte
+        std::vector<char> result(bytes.size());
+        for (size_t i = 0; i < bytes.size(); ++i)
+            result[i] = static_cast<char>(bytes[i]);
+        return result;
+    }
+
+    inline void File::writeBytes(const std::vector<char>& data) {
+        std::vector<std::byte> bytes(data.size());
+        for (size_t i = 0; i < data.size(); ++i)
+            bytes[i] = static_cast<std::byte>(data[i]);
+        writeBytesInternal(bytes);
+    }
+
 }

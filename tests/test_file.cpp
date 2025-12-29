@@ -8,7 +8,6 @@ namespace fs = std::filesystem;
 const std::string textFile = "test.txt";
 const std::string binaryFile = "binary.bin";
 
-// Helper to clean up files before/after tests
 void removeFile(const std::string& path) {
     if (fs::exists(path)) fs::remove(path);
 }
@@ -24,19 +23,19 @@ TEST_CASE("File existence and open", "[File]") {
     REQUIRE(File::exists(textFile));
 }
 
-TEST_CASE("Write and read all (text)", "[File][Text]") {
+TEST_CASE("Write and read string (text)", "[File][Text]") {
     removeFile(textFile);
 
     const std::string content = "Hello world!\nSecond line";
 
     {
         File fWrite(textFile, OpenMode::Write);
-        fWrite.writeAll(content);
+        fWrite.writeString(content);
     }
 
     {
         File fRead(textFile, OpenMode::Read);
-        REQUIRE(fRead.readAll() == content);
+        REQUIRE(fRead.readString() == content);
     }
 }
 
@@ -99,21 +98,23 @@ TEST_CASE("Append mode works (text)", "[File][Text]") {
     }
 }
 
-TEST_CASE("Binary write and read", "[File][Binary]") {
+TEST_CASE("Binary write and read bytes", "[File][Binary]") {
     removeFile(binaryFile);
 
-    const std::string binaryData = std::string("\0\1\2\3\4\255", 6);
+    std::vector<char> data = {char(0), char(1), char(2), char(3), char(4), char(-1)};
 
     {
         File fWrite(binaryFile, OpenMode::Write | OpenMode::Binary);
-        fWrite.writeAll(binaryData);
+        fWrite.writeBytes(data);
     }
 
     {
         File fRead(binaryFile, OpenMode::Read | OpenMode::Binary);
-        auto content = fRead.readAll();
-        REQUIRE(content.size() == binaryData.size());
-        REQUIRE(content == binaryData);
+        auto content = fRead.readBytes();
+        REQUIRE(content.size() == data.size());
+
+        for (size_t i = 0; i < content.size(); ++i)
+            REQUIRE(content[i] == data[i]);
     }
 }
 
@@ -131,5 +132,5 @@ TEST_CASE("Text vs Binary errors", "[File]") {
     REQUIRE_THROWS_AS(fBinary.writeLine("nope"), std::runtime_error);
 
     File fText(textFile, OpenMode::Write);
-    REQUIRE_THROWS_AS(fText.readAll(), std::runtime_error);
+    REQUIRE_THROWS_AS(fText.readString(), std::runtime_error);
 }

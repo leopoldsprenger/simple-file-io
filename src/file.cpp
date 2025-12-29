@@ -1,4 +1,4 @@
-#include "SimpleFileIO/File.h"
+#include "SimpleFileIO/File.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -38,7 +38,7 @@ struct File::Impl {
 
             if (has(mode, OpenMode::Read)) {
                 inFile.open(path, flags);
-                inFile.exceptions(std::ios::failbit | std::ios::badbit);
+                inFile.exceptions(std::ios::badbit);
             } else {
                 outFile.open(path, flags);
                 outFile.exceptions(std::ios::failbit | std::ios::badbit);
@@ -55,6 +55,13 @@ File::File(const std::string& path, OpenMode mode)
     : pImpl(new Impl(path, mode)) {}
 
 File::~File() {
+    if (pImpl->outFile.is_open()) {
+        pImpl->outFile.flush();
+        pImpl->outFile.close();
+    }
+    if (pImpl->inFile.is_open()) {
+        pImpl->inFile.close();
+    }
     delete pImpl;
 }
 

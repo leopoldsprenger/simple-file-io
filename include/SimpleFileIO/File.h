@@ -14,6 +14,22 @@ namespace SimpleFileIO {
         Binary = 1 << 3
     };
 
+    inline bool has(OpenMode value, OpenMode flag) {
+        return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
+    }
+
+    inline OpenMode operator|(OpenMode a, OpenMode b) {
+        return static_cast<OpenMode>(
+            static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
+        );
+    }
+
+    inline OpenMode operator&(OpenMode a, OpenMode b) {
+        return static_cast<OpenMode>(
+            static_cast<uint8_t>(a) & static_cast<uint8_t>(b)
+        );
+    }
+
 
     class File {
     public:

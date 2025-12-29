@@ -6,24 +6,6 @@
 
 using SimpleFileIO::OpenMode;
 
-namespace {
-    inline bool has(OpenMode value, OpenMode flag) {
-        return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
-    }
-
-    inline OpenMode operator|(OpenMode a, OpenMode b) {
-        return static_cast<OpenMode>(
-            static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
-        );
-    }
-
-    inline OpenMode operator&(OpenMode a, OpenMode b) {
-        return static_cast<OpenMode>(
-            static_cast<uint8_t>(a) & static_cast<uint8_t>(b)
-        );
-    }
-}
-
 namespace SimpleFileIO {
 
 struct File::Impl {

@@ -6,17 +6,19 @@
 namespace SimpleFileIO {
 
     // Enum for file modes
-    enum class Mode {
-        Read,
-        Write,
-        Append,
-        Binary
+    enum class OpenMode : uint8_t {
+        None   = 0,
+        Read   = 1 << 0,
+        Write  = 1 << 1,
+        Append = 1 << 2,
+        Binary = 1 << 3
     };
+
 
     class File {
     public:
         // Constructor - open file with a path and mode
-        File(const std::string& path, Mode mode);
+        File(const std::string& path, OpenMode mode);
 
         ~File();
 

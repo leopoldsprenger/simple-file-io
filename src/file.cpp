@@ -4,36 +4,62 @@
 #include <sstream>
 #include <stdexcept>
 
-using SimpleFileIO::Mode;
+using SimpleFileIO::OpenMode;
+
+namespace {
+    inline bool has(OpenMode value, OpenMode flag) {
+        return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
+    }
+
+    inline OpenMode operator|(OpenMode a, OpenMode b) {
+        return static_cast<OpenMode>(
+            static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
+        );
+    }
+
+    inline OpenMode operator&(OpenMode a, OpenMode b) {
+        return static_cast<OpenMode>(
+            static_cast<uint8_t>(a) & static_cast<uint8_t>(b)
+        );
+    }
+}
 
 namespace SimpleFileIO {
 
 struct File::Impl {
     std::ifstream inFile;
     std::ofstream outFile;
-    Mode mode;
+    OpenMode mode;
     std::string path;
 
-    Impl(const std::string& p, Mode m) : mode(m), path(p) {
+    Impl(const std::string& p, OpenMode m) : mode(m), path(p) {
         try {
-            switch (mode) {
-                case Mode::Read:
-                    inFile.open(path);
-                    inFile.exceptions(std::ios::failbit | std::ios::badbit);
-                    break;
+            if (mode == OpenMode::None) {
+                throw std::logic_error("No mode specified");
+            }
 
-                case Mode::Write:
-                    outFile.open(path, std::ios::out | std::ios::trunc);
-                    outFile.exceptions(std::ios::failbit | std::ios::badbit);
-                    break;
+            int access_count = 
+                (has(mode, OpenMode::Read) ? 1 : 0) +
+                (has(mode, OpenMode::Write) ? 1 : 0) +
+                (has(mode, OpenMode::Append) ? 1 : 0); 
+            
+            if (access_count != 1) {
+                throw std::logic_error("Exactly one of Read, Write, or Append must be set");
+            }
 
-                case Mode::Append:
-                    outFile.open(path, std::ios::out | std::ios::app);
-                    outFile.exceptions(std::ios::failbit | std::ios::badbit);
-                    break;
+            std::ios::openmode flags = std::ios::openmode{};
+            
+            if (has(mode, OpenMode::Read))  flags |= std::ios::in;
+            if (has(mode, OpenMode::Write)) flags |= std::ios::out | std::ios::trunc;
+            if (has(mode, OpenMode::Append))  flags |= std::ios::out | std::ios::app;
+            if (has(mode, OpenMode::Binary))  flags |= std::ios::binary;
 
-                case Mode::Binary:
-                    throw std::logic_error("Binary mode not implemented");
+            if (has(mode, OpenMode::Read)) {
+                inFile.open(path, flags);
+                inFile.exceptions(std::ios::failbit | std::ios::badbit);
+            } else {
+                outFile.open(path, flags);
+                outFile.exceptions(std::ios::failbit | std::ios::badbit);
             }
         } catch (const std::ios_base::failure& e) {
             throw std::runtime_error(
@@ -43,7 +69,7 @@ struct File::Impl {
     }
 };
 
-File::File(const std::string& path, Mode mode)
+File::File(const std::string& path, OpenMode mode)
     : pImpl(new Impl(path, mode)) {}
 
 File::~File() {
@@ -60,9 +86,9 @@ bool File::isOpen() const {
 }
 
 std::string File::readAll() {
-    if (!pImpl->inFile.is_open())
-        throw std::logic_error("File not open for reading");
-
+    if (!has(pImpl->mode, OpenMode::Read))
+        throw std::runtime_error("File not opened in read mode");
+    
     try {
         std::ostringstream buffer;
         buffer << pImpl->inFile.rdbuf();
@@ -75,8 +101,8 @@ std::string File::readAll() {
 }
 
 std::string File::readLine() {
-    if (!pImpl->inFile.is_open())
-        throw std::logic_error("File not open for reading");
+    if (!has(pImpl->mode, OpenMode::Read))
+        throw std::runtime_error("File not opened in read mode");
 
     try {
         std::string line;
@@ -92,8 +118,8 @@ std::string File::readLine() {
 }
 
 std::vector<std::string> File::readLines(int numLines) {
-    if (!pImpl->inFile.is_open())
-        throw std::logic_error("File not open for reading");
+    if (!has(pImpl->mode, OpenMode::Read))
+        throw std::runtime_error("File not opened in read mode");
 
     std::vector<std::string> lines;
     if (numLines > 0) lines.reserve(numLines);
@@ -117,8 +143,8 @@ std::vector<std::string> File::readLines(int numLines) {
 }
 
 void File::writeAll(const std::string& data) {
-    if (!pImpl->outFile.is_open())
-        throw std::logic_error("File not open for writing");
+    if (!has(pImpl->mode, OpenMode::Write) && !has(pImpl->mode, OpenMode::Append))
+        throw std::runtime_error("File not open in write mode or append mode");
 
     try {
         pImpl->outFile << data;
@@ -131,8 +157,8 @@ void File::writeAll(const std::string& data) {
 }
 
 void File::writeLine(const std::string& line) {
-    if (!pImpl->outFile.is_open())
-        throw std::logic_error("File not open for writing");
+    if (!has(pImpl->mode, OpenMode::Write) && !has(pImpl->mode, OpenMode::Append))
+        throw std::runtime_error("File not opened in write/append mode");
 
     try {
         pImpl->outFile << line << '\n';
@@ -144,12 +170,13 @@ void File::writeLine(const std::string& line) {
 }
 
 void File::writeLines(const std::vector<std::string>& lines) {
-    if (!pImpl->outFile.is_open())
-        throw std::logic_error("File not open for writing");
+    if (!has(pImpl->mode, OpenMode::Write) && !has(pImpl->mode, OpenMode::Append))
+        throw std::runtime_error("File not opened in write/append mode");
 
     try {
         for (const auto& line : lines)
             pImpl->outFile << line << '\n';
+        pImpl->outFile.flush();
     } catch (const std::ios_base::failure& e) {
         throw std::runtime_error(
             "Error writing lines to '" + pImpl->path + "': " + e.what()

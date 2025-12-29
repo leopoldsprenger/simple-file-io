@@ -15,7 +15,6 @@ find_package(Catch2 3 REQUIRED)
 
 # Build test executable
 add_executable(tests
-    src/file.cpp
     tests/test_file.cpp
 )
 

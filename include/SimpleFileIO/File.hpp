@@ -2,10 +2,12 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+#include <cstdint>
 
 namespace SimpleFileIO {
-
-    // Enum for file modes
     enum class OpenMode : uint8_t {
         None   = 0,
         Read   = 1 << 0,
@@ -30,49 +32,205 @@ namespace SimpleFileIO {
         );
     }
 
-
     class File {
     public:
-        // Constructor - open file with a path and mode
-        File(const std::string& path, OpenMode mode);
+        inline File(const std::string& path, OpenMode mode);
+        inline ~File();
 
-        ~File();
+        inline bool isOpen() const;
+        inline static bool exists(const std::string& path);
 
-        // Check if the file is successfully open
-        bool isOpen() const;
+        inline std::string readAll();
+        inline std::string readLine();
+        inline std::vector<std::string> readLines(int numLines = 0);
 
-        // Check if the file exists
-        static bool exists(const std::string& path);
+        inline void writeAll(const std::string& data);
+        inline void writeLine(const std::string& line);
+        inline void writeLines(const std::vector<std::string>& lines);
 
-        // Read entire file into a string
-        std::string readAll();
+        inline void append(const std::string& data);
+        inline void appendLine(const std::string& line);
+        inline void appendLines(const std::vector<std::string>& lines);
 
-        // Read a single line from file
-        std::string readLine();
-
-        // Read file line by line
-        std::vector<std::string> readLines(const int numLines = 0);
-
-        // Write entire string to file
-        void writeAll(const std::string& data);
-
-        // Write a single line to file
-        void writeLine(const std::string& line);
-
-        // Write lines to file
-        void writeLines(const std::vector<std::string>& lines);
-
-        // Append string to file
-        void append(const std::string& data);
-
-        // Append lines to file
-        void appendLines(const std::vector<std::string>& lines);
-
-        // Append a single line to file
-        void appendLine(const std::string& line);
-    
     private:
         struct Impl;
         Impl* pImpl;
     };
+
+    struct File::Impl {
+        std::ifstream inFile;
+        std::ofstream outFile;
+        OpenMode mode;
+        std::string path;
+
+        inline Impl(const std::string& p, OpenMode m)
+            : mode(m), path(p)
+        {
+            if (mode == OpenMode::None)
+                throw std::logic_error("No mode specified");
+
+            int access_count =
+                (has(mode, OpenMode::Read)   ? 1 : 0) +
+                (has(mode, OpenMode::Write)  ? 1 : 0) +
+                (has(mode, OpenMode::Append) ? 1 : 0);
+
+            if (access_count != 1)
+                throw std::logic_error(
+                    "Exactly one of Read, Write, or Append must be set"
+                );
+
+            std::ios::openmode flags = std::ios::openmode{};
+
+            if (has(mode, OpenMode::Read))   flags |= std::ios::in;
+            if (has(mode, OpenMode::Write))  flags |= std::ios::out | std::ios::trunc;
+            if (has(mode, OpenMode::Append)) flags |= std::ios::out | std::ios::app;
+            if (has(mode, OpenMode::Binary)) flags |= std::ios::binary;
+
+            try {
+                if (has(mode, OpenMode::Read)) {
+                    inFile.open(path, flags);
+                    inFile.exceptions(std::ios::badbit);
+                } else {
+                    outFile.open(path, flags);
+                    outFile.exceptions(std::ios::failbit | std::ios::badbit);
+                }
+            } catch (const std::ios_base::failure& e) {
+                throw std::runtime_error(
+                    "Failed to open file '" + path + "': " + e.what()
+                );
+            }
+        }
+    };
+
+    inline File::File(const std::string& path, OpenMode mode)
+        : pImpl(new Impl(path, mode)) {}
+
+    inline File::~File() {
+        if (pImpl) {
+            if (pImpl->outFile.is_open()) {
+                pImpl->outFile.flush();
+                pImpl->outFile.close();
+            }
+            if (pImpl->inFile.is_open()) {
+                pImpl->inFile.close();
+            }
+            delete pImpl;
+        }
+    }
+
+    inline bool File::exists(const std::string& path) {
+        std::ifstream file(path);
+        return file.is_open();
+    }
+
+    inline bool File::isOpen() const {
+        return pImpl->inFile.is_open() || pImpl->outFile.is_open();
+    }
+
+    inline std::string File::readAll() {
+        if (!has(pImpl->mode, OpenMode::Read))
+            throw std::runtime_error("File not opened in read mode");
+
+        try {
+            std::ostringstream buffer;
+            buffer << pImpl->inFile.rdbuf();
+            return buffer.str();
+        } catch (const std::ios_base::failure& e) {
+            throw std::runtime_error(
+                "Error reading file '" + pImpl->path + "': " + e.what()
+            );
+        }
+    }
+
+    inline std::string File::readLine() {
+        if (!has(pImpl->mode, OpenMode::Read))
+            throw std::runtime_error("File not opened in read mode");
+        if (has(pImpl->mode, OpenMode::Binary))
+            throw std::runtime_error("readLine() not supported in binary mode");
+
+        try {
+            std::string line;
+            if (std::getline(pImpl->inFile, line))
+                return line;
+
+            throw std::out_of_range("End of file reached");
+        } catch (const std::ios_base::failure& e) {
+            throw std::runtime_error(
+                "Error reading line from '" + pImpl->path + "': " + e.what()
+            );
+        }
+    }
+
+    inline std::vector<std::string> File::readLines(int numLines) {
+        if (!has(pImpl->mode, OpenMode::Read))
+            throw std::runtime_error("File not opened in read mode");
+
+        std::vector<std::string> lines;
+        if (numLines > 0) lines.reserve(numLines);
+
+        try {
+            std::string line;
+            int count = 0;
+
+            while (std::getline(pImpl->inFile, line)) {
+                lines.push_back(line);
+                if (numLines > 0 && ++count >= numLines)
+                    break;
+            }
+
+            return lines;
+        } catch (const std::ios_base::failure& e) {
+            throw std::runtime_error(
+                "Error reading lines from '" + pImpl->path + "': " + e.what()
+            );
+        }
+    }
+
+    inline void File::writeAll(const std::string& data) {
+        if (!has(pImpl->mode, OpenMode::Write) &&
+            !has(pImpl->mode, OpenMode::Append))
+            throw std::runtime_error("File not opened in write/append mode");
+
+        try {
+            pImpl->outFile << data;
+            pImpl->outFile.flush();
+        } catch (const std::ios_base::failure& e) {
+            throw std::runtime_error(
+                "Error writing to '" + pImpl->path + "': " + e.what()
+            );
+        }
+    }
+
+    inline void File::writeLine(const std::string& line) {
+        if (!has(pImpl->mode, OpenMode::Write) &&
+            !has(pImpl->mode, OpenMode::Append))
+            throw std::runtime_error("File not opened in write/append mode");
+        if (has(pImpl->mode, OpenMode::Binary))
+            throw std::runtime_error("writeLine() not supported in binary mode");
+
+        try {
+            pImpl->outFile << line << '\n';
+            pImpl->outFile.flush();
+        } catch (const std::ios_base::failure& e) {
+            throw std::runtime_error(
+                "Error writing line to '" + pImpl->path + "': " + e.what()
+            );
+        }
+    }
+
+    inline void File::writeLines(const std::vector<std::string>& lines) {
+        if (!has(pImpl->mode, OpenMode::Write) &&
+            !has(pImpl->mode, OpenMode::Append))
+            throw std::runtime_error("File not opened in write/append mode");
+
+        try {
+            for (const auto& line : lines)
+                pImpl->outFile << line << '\n';
+            pImpl->outFile.flush();
+        } catch (const std::ios_base::failure& e) {
+            throw std::runtime_error(
+                "Error writing lines to '" + pImpl->path + "': " + e.what()
+            );
+        }
+    }
 }

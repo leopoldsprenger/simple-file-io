@@ -49,6 +49,9 @@ namespace SimpleFileIO {
 
         // Append lines to file
         void appendLines(const std::vector<std::string>& lines);
+
+        // Append a single line to file
+        void appendLine(const std::string& line);
     
     private:
         struct Impl;

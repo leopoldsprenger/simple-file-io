@@ -1,4 +1,5 @@
 #include "SimpleFileIO/File.h"
+
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -13,30 +14,32 @@ struct File::Impl {
     Mode mode;
     std::string path;
 
-    Impl(const std::string& p, Mode m) : path(p), mode(m) {
-        // Open the file according to mode
-        switch (mode) {
-            case Mode::Read:
-                inFile.open(path);
-                if (!inFile.is_open()) throw std::runtime_error("Cannot open file for reading");
-                break;
-            case Mode::Write:
-                outFile.open(path, std::ios::trunc);
-                if (!outFile.is_open()) throw std::runtime_error("Cannot open file for writing");
-                break;
-            case Mode::Append:
-                outFile.open(path, std::ios::app);
-                if (!outFile.is_open()) throw std::runtime_error("Cannot open file for appending");
-                break;
-            case Mode::Binary:
-                // Handle binary mode later
-                break;
-        }
-    }
+    Impl(const std::string& p, Mode m) : mode(m), path(p) {
+        try {
+            switch (mode) {
+                case Mode::Read:
+                    inFile.open(path);
+                    inFile.exceptions(std::ios::failbit | std::ios::badbit);
+                    break;
 
-    ~Impl() {
-        if (inFile.is_open()) inFile.close();
-        if (outFile.is_open()) outFile.close();
+                case Mode::Write:
+                    outFile.open(path, std::ios::out | std::ios::trunc);
+                    outFile.exceptions(std::ios::failbit | std::ios::badbit);
+                    break;
+
+                case Mode::Append:
+                    outFile.open(path, std::ios::out | std::ios::app);
+                    outFile.exceptions(std::ios::failbit | std::ios::badbit);
+                    break;
+
+                case Mode::Binary:
+                    throw std::logic_error("Binary mode not implemented");
+            }
+        } catch (const std::ios_base::failure& e) {
+            throw std::runtime_error(
+                "Failed to open file '" + path + "': " + e.what()
+            );
+        }
     }
 };
 
@@ -57,100 +60,100 @@ bool File::isOpen() const {
 }
 
 std::string File::readAll() {
-    if (!pImpl->inFile.is_open()) {
-        throw std::runtime_error("File not open for reading");
-    }
-    
+    if (!pImpl->inFile.is_open())
+        throw std::logic_error("File not open for reading");
+
     try {
-        std::string data((std::istreambuf_iterator<char>(pImpl->inFile)),
-                         std::istreambuf_iterator<char>());
-        return data;
+        std::ostringstream buffer;
+        buffer << pImpl->inFile.rdbuf();
+        return buffer.str();
     } catch (const std::ios_base::failure& e) {
-        throw std::runtime_error("Error reading file: " + std::string(e.what()));
+        throw std::runtime_error(
+            "Error reading file '" + pImpl->path + "': " + e.what()
+        );
     }
 }
 
 std::string File::readLine() {
-    if (!pImpl->inFile.is_open()) {
-        throw std::runtime_error("File not open for reading");
-    }
+    if (!pImpl->inFile.is_open())
+        throw std::logic_error("File not open for reading");
 
-    std::string line;
     try {
-        if (std::getline(pImpl->inFile, line)) {
+        std::string line;
+        if (std::getline(pImpl->inFile, line))
             return line;
-        } else if (pImpl->inFile.eof()) {
-            pImpl->inFile.clear();
-            throw std::runtime_error("End of file reached");
-        } else {
-            throw std::runtime_error("Error reading line from file");
-        }
+
+        throw std::out_of_range("End of file reached");
     } catch (const std::ios_base::failure& e) {
-        throw std::runtime_error("File read failure: " + std::string(e.what()));
+        throw std::runtime_error(
+            "Error reading line from '" + pImpl->path + "': " + e.what()
+        );
     }
 }
 
 std::vector<std::string> File::readLines(int numLines) {
-    if (!pImpl->inFile.is_open()) {
-        throw std::runtime_error("File not open for reading");
-    }
+    if (!pImpl->inFile.is_open())
+        throw std::logic_error("File not open for reading");
 
     std::vector<std::string> lines;
-    std::string line;
-
     if (numLines > 0) lines.reserve(numLines);
 
     try {
+        std::string line;
         int count = 0;
+
         while (std::getline(pImpl->inFile, line)) {
             lines.push_back(line);
-            if (numLines > 0 && ++count >= numLines) break;
+            if (numLines > 0 && ++count >= numLines)
+                break;
         }
+
+        return lines;
     } catch (const std::ios_base::failure& e) {
-        throw std::runtime_error("Error reading lines: " + std::string(e.what()));
+        throw std::runtime_error(
+            "Error reading lines from '" + pImpl->path + "': " + e.what()
+        );
     }
-
-    pImpl->inFile.clear();
-    pImpl->inFile.seekg(0);
-
-    return lines;
 }
 
 void File::writeAll(const std::string& data) {
-    if (!pImpl->outFile.is_open()) {
-        throw std::runtime_error("File not open for writing");
-    }
+    if (!pImpl->outFile.is_open())
+        throw std::logic_error("File not open for writing");
 
     try {
         pImpl->outFile << data;
+        pImpl->outFile.flush();
     } catch (const std::ios_base::failure& e) {
-        throw std::runtime_error("Error writing file: " + std::string(e.what()));
+        throw std::runtime_error(
+            "Error writing to '" + pImpl->path + "': " + e.what()
+        );
     }
 }
 
 void File::writeLine(const std::string& line) {
-    if (!pImpl->outFile.is_open()) {
-        throw std::runtime_error("File not open for writing");
-    }
+    if (!pImpl->outFile.is_open())
+        throw std::logic_error("File not open for writing");
 
     try {
         pImpl->outFile << line << '\n';
     } catch (const std::ios_base::failure& e) {
-        throw std::runtime_error("Error writing line to file: " + std::string(e.what()));
+        throw std::runtime_error(
+            "Error writing line to '" + pImpl->path + "': " + e.what()
+        );
     }
 }
 
 void File::writeLines(const std::vector<std::string>& lines) {
-    if (!pImpl->outFile.is_open()) {
-        throw std::runtime_error("File not open for writing");
-    }
+    if (!pImpl->outFile.is_open())
+        throw std::logic_error("File not open for writing");
 
     try {
-        std::ostringstream buffer;
-        for (const auto& line : lines) buffer << line << '\n';
-        pImpl->outFile << buffer.str();
+        for (const auto& line : lines)
+            pImpl->outFile << line << '\n';
     } catch (const std::ios_base::failure& e) {
-        throw std::runtime_error("Error writing lines: " + std::string(e.what()));
+        throw std::runtime_error(
+            "Error writing lines to '" + pImpl->path + "': " + e.what()
+        );
     }
 }
 

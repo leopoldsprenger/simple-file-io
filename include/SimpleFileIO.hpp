@@ -43,6 +43,7 @@ namespace SimpleFileIO {
 
         inline bool isOpen() const;
         inline static bool exists(const std::string& path);
+        inline void flush();
 
         inline std::string readString();
         inline std::string readLine();
@@ -137,6 +138,10 @@ namespace SimpleFileIO {
         return pImpl->inFile.is_open() || pImpl->outFile.is_open();
     }
 
+    inline void File::flush() {
+        pImpl->outFile.flush();
+    }
+
     inline std::string File::readString() {
         if (!has(pImpl->mode, OpenMode::Read))
             throw std::runtime_error("File not opened in read mode");
@@ -202,7 +207,6 @@ namespace SimpleFileIO {
 
         try {
             pImpl->outFile << data;
-            pImpl->outFile.flush(); // ensure data is written
         } catch (const std::ios_base::failure& e) {
             throw std::runtime_error(
                 "Error writing text to '" + pImpl->path + "': " + e.what()
@@ -219,7 +223,6 @@ namespace SimpleFileIO {
 
         try {
             pImpl->outFile << line << '\n';
-            pImpl->outFile.flush();
         } catch (const std::ios_base::failure& e) {
             throw std::runtime_error(
                 "Error writing line to '" + pImpl->path + "': " + e.what()
@@ -261,7 +264,6 @@ namespace SimpleFileIO {
             throw std::runtime_error("writeBytes() requires binary mode");
 
         pImpl->outFile.write(reinterpret_cast<const char*>(data.data()), data.size());
-        pImpl->outFile.flush();
     }
 
     inline std::vector<char> File::readBytes() {

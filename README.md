@@ -85,7 +85,7 @@ writerMulti.writeLines({"Line 1", "Line 2", "Line 3"});
 ### Reading entire file content
 ```cpp
 File reader("example.txt", OpenMode::Read);
-std::string content = reader.readAll();
+std::string content = reader.readString();
 std::cout << content << "\n";
 ```
 

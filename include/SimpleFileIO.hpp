@@ -2,9 +2,10 @@
 
 #include <string>
 #include <vector>
-#include <fstream>
 #include <stdexcept>
+#include <cstdio>
 #include <cstdint>
+#include <filesystem>
 
 namespace SimpleFileIO {
     // Bitmask flags for opening modes
@@ -20,7 +21,6 @@ namespace SimpleFileIO {
         return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
     }
 
-    // Bitwise operators for OpenMode flags
     inline OpenMode operator|(OpenMode a, OpenMode b) {
         return static_cast<OpenMode>(
             static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
@@ -59,7 +59,7 @@ namespace SimpleFileIO {
     };
 
     struct File::Impl {
-        std::fstream file;
+        FILE* file = nullptr;
         OpenMode mode;
         std::string path;
 
@@ -89,21 +89,21 @@ namespace SimpleFileIO {
                     "Exactly one of Read, Write, or Append must be set"
                 );
 
-            // Build open flags
-            std::ios::openmode flags = std::ios::openmode{};
-            if (canRead) flags |= std::ios::in;
-            if (canWrite) flags |= std::ios::out | std::ios::trunc;
-            if (canAppend) flags |= std::ios::out | std::ios::app;
-            if (isBinary) flags |= std::ios::binary;
+            // Determine fopen mode string
+            const char* modeStr = nullptr;
+            if (canRead)        modeStr = isBinary ? "rb" : "r";
+            else if (canWrite)  modeStr = isBinary ? "wb" : "w";
+            else if (canAppend) modeStr = isBinary ? "ab" : "a";
 
-            // Open the single fstream and set exceptions
-            try {
-                file.open(path, flags);
-                file.exceptions(std::ios::badbit);
-            } catch (const std::ios_base::failure& e) {
-                throw std::runtime_error(
-                    "Failed to open file '" + path + "': " + e.what()
-                );
+            // Open the file
+            file = std::fopen(path.c_str(), modeStr);
+            if (!file)
+                throw std::runtime_error("Failed to open file '" + path + "'");
+
+            // Optimize buffering: use a large 1 MB buffer for faster I/O
+            static char buf[1 << 20]; // 1 MB
+            if (std::setvbuf(file, buf, _IOFBF, sizeof(buf)) != 0) {
+                throw std::runtime_error("Failed to set file buffer for '" + path + "'");
             }
         }
     };
@@ -114,10 +114,10 @@ namespace SimpleFileIO {
     inline File::~File() {
         if (!pImpl) return;
 
-        if (pImpl->file.is_open()) {
+        if (pImpl->file) {
             if (pImpl->canWrite || pImpl->canAppend)
-                pImpl->file.flush();
-            pImpl->file.close();
+                std::fflush(pImpl->file);
+            std::fclose(pImpl->file);
         }
 
         delete pImpl;
@@ -128,11 +128,12 @@ namespace SimpleFileIO {
     }
 
     inline bool File::isOpen() const {
-        return pImpl->file.is_open();
+        return pImpl->file != nullptr;
     }
 
     inline void File::flush() {
-        pImpl->file.flush();
+        if (!pImpl->file) return;
+        std::fflush(pImpl->file);
     }
 
     inline std::string File::readString() {
@@ -141,26 +142,16 @@ namespace SimpleFileIO {
         if (pImpl->isBinary)
             throw std::runtime_error("readString() not supported in binary mode");
 
-        pImpl->file.clear();
+        std::fseek(pImpl->file, 0, SEEK_END);
+        long size = std::ftell(pImpl->file);
+        if (size < 0) throw std::runtime_error("Failed to determine file size");
+        std::fseek(pImpl->file, 0, SEEK_SET);
 
-        // Move to end to get file size
-        pImpl->file.seekg(0, std::ios::end);
-        auto end = pImpl->file.tellg();
-        if (end < 0)
-            throw std::runtime_error("Failed to determine file size");
-
-        size_t size = static_cast<size_t>(end);
-        pImpl->file.seekg(0, std::ios::beg);
-
-        std::string result(size, '\0');
-
-        // Only wrap the actual read in try/catch
-        try {
-            pImpl->file.read(result.data(), size);
-        } catch (const std::ios_base::failure& e) {
-            throw std::runtime_error(
-                "Error reading text file '" + pImpl->path + "': " + e.what()
-            );
+        std::string result(static_cast<size_t>(size), '\0');
+        if (size > 0) {
+            size_t readBytes = std::fread(result.data(), 1, result.size(), pImpl->file);
+            if (readBytes != result.size())
+                throw std::runtime_error("Failed to read full file '" + pImpl->path + "'");
         }
 
         return result;
@@ -173,14 +164,16 @@ namespace SimpleFileIO {
             throw std::runtime_error("readLine() not supported in binary mode");
 
         std::string line;
-        if (std::getline(pImpl->file, line))
-            return line;
-
-        // EOF reached
-        if (pImpl->file.eof()) 
+        line.reserve(128);
+        int c;
+        while ((c = std::fgetc(pImpl->file)) != EOF) {
+            if (c == '\n') break;
+            line += static_cast<char>(c);
+        }
+        if (line.empty() && std::feof(pImpl->file))
             throw std::out_of_range("End of file reached");
 
-        throw std::ios_base::failure("Unknown iostream error");
+        return line;
     }
 
     inline std::vector<std::string> File::readLines(int numLines) {
@@ -192,10 +185,11 @@ namespace SimpleFileIO {
         std::vector<std::string> lines;
         if (numLines > 0) lines.reserve(numLines);
 
-        std::string line;
-        while ((numLines == 0 || lines.size() < numLines) &&
-            std::getline(pImpl->file, line)) {
-            lines.push_back(std::move(line));
+        try {
+            while (numLines == 0 || lines.size() < numLines)
+                lines.push_back(readLine());
+        } catch (const std::out_of_range&) {
+            // EOF reached, stop reading
         }
 
         return lines;
@@ -207,22 +201,13 @@ namespace SimpleFileIO {
         if (pImpl->isBinary)
             throw std::runtime_error("writeString() not supported in binary mode");
 
-        if (pImpl->canAppend)
-            pImpl->file.seekp(0, std::ios::end);
-
-        pImpl->file << data;
+        size_t written = std::fwrite(data.data(), 1, data.size(), pImpl->file);
+        if (written != data.size())
+            throw std::runtime_error("Failed to write full string to '" + pImpl->path + "'");
     }
 
     inline void File::writeLine(const std::string& line) {
-        if (!pImpl->canWrite && !pImpl->canAppend)
-            throw std::runtime_error("File not opened in write/append mode");
-        if (pImpl->isBinary)
-            throw std::runtime_error("writeLine() not supported in binary mode");
-
-        if (pImpl->canAppend)
-            pImpl->file.seekp(0, std::ios::end);
-
-        pImpl->file << line << '\n';
+        writeString(line + '\n');
     }
 
     inline void File::writeLines(const std::vector<std::string>& lines) {
@@ -236,18 +221,18 @@ namespace SimpleFileIO {
         if (!pImpl->isBinary)
             throw std::runtime_error("readBytes() requires binary mode");
 
-        pImpl->file.clear();
-        pImpl->file.seekg(0, std::ios::end);
+        std::fseek(pImpl->file, 0, SEEK_END);
+        long size = std::ftell(pImpl->file);
+        if (size < 0) throw std::runtime_error("Failed to determine file size");
+        std::fseek(pImpl->file, 0, SEEK_SET);
 
-        auto end = pImpl->file.tellg();
-        if (end < 0)
-            throw std::runtime_error("Failed to determine file size");
+        std::vector<char> data(static_cast<size_t>(size));
+        if (size > 0) {
+            size_t readBytes = std::fread(data.data(), 1, data.size(), pImpl->file);
+            if (readBytes != data.size())
+                throw std::runtime_error("Failed to read full file '" + pImpl->path + "'");
+        }
 
-        size_t size = static_cast<size_t>(end);
-        pImpl->file.seekg(0);
-
-        std::vector<char> data(size);
-        pImpl->file.read(data.data(), size);
         return data;
     }
 
@@ -257,10 +242,8 @@ namespace SimpleFileIO {
         if (!pImpl->isBinary)
             throw std::runtime_error("writeBytes() requires binary mode");
 
-        // Move write pointer to end if in append mode
-        if (pImpl->canAppend)
-            pImpl->file.seekp(0, std::ios::end);
-
-        pImpl->file.write(data.data(), data.size());
+        size_t written = std::fwrite(data.data(), 1, data.size(), pImpl->file);
+        if (written != data.size())
+            throw std::runtime_error("Failed to write full data to '" + pImpl->path + "'");
     }
 }

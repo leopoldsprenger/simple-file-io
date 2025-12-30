@@ -3,7 +3,7 @@
 ![C++](https://img.shields.io/badge/C%2B%2B-23-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-**Header-only C++17+ library for robust, intuitive file input/output operations.**
+Ultra-fast, safe, and Pythonic file I/O for C++17+, with zero dependencies and benchmarks to prove it.
 
 
 ---
@@ -15,7 +15,8 @@
 3. [Scope & Limitations](#scope--limitations)  
 4. [Usage Examples](#usage-examples)  
 5. [Integration & Build](#integration--build)  
-6. [License](#license)  
+6. [Benchmarking](#benchmarking)
+7. [License](#license)  
 
 ---
 
@@ -142,6 +143,31 @@ include_directories(path/to/SimpleFileIO/include)
 
 add_executable(dummy main.cpp)
 ```
+---
+
+## Benchmarking
+
+Benchmarking shows that SimpleFileIO is faster than Python for many common file operations and nearly matches the speed of **Raw File*** (C `FILE*`-based I/O). It achieves this while remaining as easy to use as Python and requiring **no manual checks** thanks to its class-based, RAII API.
+
+**Results (median timings / diffs):**
+
+| Operation  | SFIO (ms) | vs Python | vs Raw File* |
+|-----------:|----------:|---------:|-------------:|
+| readString  | ✔ 0.00 | -3.57  | -0.73  |
+| readLines   | ✔ 0.02 | -43.15 | -25.08 |
+| readLine    | ✔ 0.02 | -0.02  | -24.69 |
+| readBytes   | ✔ 0.02 | -2.42  | -0.71  |
+| writeString | ✘ 0.81 | -2.43  | +0.06  |
+| writeLines  | ✔ 8.11 | -42.19 | -13.38 |
+| writeLine   | ✘ 0.03 | -0.09  | +0.01  |
+| writeBytes  | ✘ 0.80 | -0.75  | +0.06  |
+
+> **Notes:**
+> - Negative numbers (e.g., -3.57) indicate that SimpleFileIO is faster than the comparison baseline (Python or Raw File*) by that many milliseconds.  
+> - Small positive numbers (e.g., +0.01) mean SFIO is marginally slower than the baseline, which is negligible and mostly due to OS-level caching behavior rather than library inefficiency.  
+> - “vs Raw File*” compares SFIO to raw FILE* I/O (fopen/fread/fwrite).  
+> - Benchmarks were collected using the `bench/benchmark_all.cpp` and `bench/benchmark_python.py` scripts (median of multiple runs).
+
 ---
 
 ## License

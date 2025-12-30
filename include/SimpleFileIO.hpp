@@ -1,5 +1,9 @@
 #pragma once
 
+#if defined(__linux__) && !defined(_GNU_SOURCE)
+#define _GNU_SOURCE
+#endif
+
 #include <string>
 #include <vector>
 #include <stdexcept>
@@ -7,6 +11,16 @@
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
+#include <algorithm>
+
+// Wrapper macros for portable fast I/O
+#if defined(__linux__)
+#define SFIO_FWRITE fwrite_unlocked
+#define SFIO_FREAD  fread_unlocked
+#else
+#define SFIO_FWRITE std::fwrite
+#define SFIO_FREAD  std::fread
+#endif
 
 namespace SimpleFileIO {
     // Text reader: optimized for text input
@@ -27,7 +41,10 @@ namespace SimpleFileIO {
     private:
         FILE* file = nullptr;
         std::string path;
-        std::vector<char> buffer; // per-file 1MB buffer
+
+        std::vector<char> buffer; // 1MB buffer
+        size_t cursor = 0;        // current position in buffer
+        size_t bufferEnd = 0;     // end of valid data in buffer
     };
 
     inline TextReader::TextReader(const std::string& p)
@@ -38,11 +55,8 @@ namespace SimpleFileIO {
         if (!file)
             throw std::runtime_error("Failed to open file '" + path + "'");
 
-        // Allocate per-file 1 MB buffer
+        // Allocate per-file 1 MB buffer for manual buffered reads
         buffer.resize(1 << 20);
-        if (std::setvbuf(file, buffer.data(), _IOFBF, buffer.size()) != 0) {
-            throw std::runtime_error("Failed to set file buffer for '" + path + "'");
-        }
     }
 
     inline TextReader::~TextReader() {
@@ -71,7 +85,7 @@ namespace SimpleFileIO {
 
         std::string result(static_cast<size_t>(size), '\0');
         if (size > 0) {
-            size_t readBytes = std::fread(result.data(), 1, result.size(), file);
+            size_t readBytes = SFIO_FREAD(result.data(), 1, result.size(), file);
             if (readBytes != result.size())
                 throw std::runtime_error("Failed to read full file '" + path + "'");
         }
@@ -80,48 +94,51 @@ namespace SimpleFileIO {
     }
 
     inline std::string TextReader::readLine() {
-        char buf[1024];
+        if (!file) throw std::runtime_error("File not open");
         std::string line;
-        
+
         while (true) {
-            // Read up to sizeof(buf)-1 characters, stops at newline or EOF
-            if (!std::fgets(buf, sizeof(buf), file)) {
-                if (line.empty() && std::feof(file))
-                    throw std::out_of_range("End of file reached");
+            if (cursor >= bufferEnd) {
+                // refill buffer
+                size_t leftover = bufferEnd - cursor;
+                if (leftover > 0) {
+                    std::memmove(buffer.data(), buffer.data() + cursor, leftover);
+                }
+                size_t bytesRead = SFIO_FREAD(buffer.data() + leftover, 1, buffer.size() - leftover, file);
+                if (bytesRead == 0) {
+                    if (line.empty()) throw std::out_of_range("End of file reached");
+                    break;
+                }
+                cursor = 0;
+                bufferEnd = leftover + bytesRead;
+            }
+
+            // find newline
+            size_t start = cursor;
+            while (cursor < bufferEnd && buffer[cursor] != '\n') cursor++;
+
+            line.append(buffer.data() + start, cursor - start);
+
+            if (cursor < bufferEnd && buffer[cursor] == '\n') {
+                cursor++; // skip newline
                 break;
             }
-
-            // Check if a newline is in the buffer
-            char* nl = std::strchr(buf, '\n');
-            if (nl) {
-                *nl = '\0';          // remove newline
-                line += buf;         // append the chunk up to newline
-                break;               // line complete
-            }
-
-            line += buf;             // no newline, append entire chunk and continue
+            // continue loop if newline not found
         }
 
         return line;
     }
 
     inline std::vector<std::string> TextReader::readLines(int numLines) {
-        std::string data = readString(); // bulk read
         std::vector<std::string> lines;
         if (numLines > 0) lines.reserve(numLines);
 
-        size_t prev = 0;
-        size_t pos;
-        while ((pos = data.find('\n', prev)) != std::string::npos) {
-            lines.push_back(data.substr(prev, pos - prev));
-            prev = pos + 1;
-            if (numLines > 0 && lines.size() >= static_cast<size_t>(numLines))
-                break;
-        }
-
-        // Add last line if it doesn't end with newline
-        if ((numLines == 0 || lines.size() < static_cast<size_t>(numLines)) && prev < data.size()) {
-            lines.push_back(data.substr(prev, data.size() - prev));
+        try {
+            while (numLines == 0 || lines.size() < static_cast<size_t>(numLines)) {
+                lines.push_back(readLine());
+            }
+        } catch (const std::out_of_range&) {
+            // Reached EOF - fail silently
         }
 
         return lines;
@@ -156,11 +173,8 @@ namespace SimpleFileIO {
         if (!file)
             throw std::runtime_error("Failed to open file '" + path + "'");
 
-        // Allocate per-file 1 MB buffer
+        // Allocate per-file 1 MB buffer for assembling write payloads
         buffer.resize(1 << 20);
-        if (std::setvbuf(file, buffer.data(), _IOFBF, buffer.size()) != 0) {
-            throw std::runtime_error("Failed to set file buffer for '" + path + "'");
-        }
     }
 
     inline TextWriter::~TextWriter() {
@@ -183,22 +197,61 @@ namespace SimpleFileIO {
     }
 
     inline void TextWriter::writeString(const std::string& data) {
-        size_t written = std::fwrite(data.data(), 1, data.size(), file);
-        if (written != data.size())
-            throw std::runtime_error("Failed to write full string to '" + path + "'");
+        // chunked write to avoid issues with extremely large strings
+        const size_t chunkSize = 1 << 20;
+        size_t offset = 0;
+        while (offset < data.size()) {
+            size_t toWrite = std::min(chunkSize, data.size() - offset);
+            size_t written = SFIO_FWRITE(data.data() + offset, 1, toWrite, file);
+            if (written != toWrite)
+                throw std::runtime_error("Failed to write full string to '" + path + "'");
+            offset += written;
+        }
     }
 
     inline void TextWriter::writeLine(const std::string& line) {
-        writeString(line + '\n');
+        if (!file) throw std::runtime_error("File not open");
+        // Use single preallocated buffer per TextWriter
+        buffer.clear();
+        buffer.insert(buffer.end(), line.begin(), line.end());
+        buffer.push_back('\n');
+        size_t written = SFIO_FWRITE(buffer.data(), 1, buffer.size(), file);
+        if (written != buffer.size())
+            throw std::runtime_error("Failed to write line to '" + path + "'");
     }
 
     inline void TextWriter::writeLines(const std::vector<std::string>& lines) {
-        std::string all;
-        for (const auto& line : lines) {
-            all += line;
-            all += '\n';
+        if (!file) throw std::runtime_error("File not open");
+        if (lines.empty()) return;
+
+        // Compute total size: sum of line sizes + missing newlines for lines that don't end with '\n'
+        size_t totalSize = 0;
+        size_t missingNewlines = 0;
+        for (const auto &line : lines) {
+            totalSize += line.size();
+            if (line.empty() || line.back() != '\n') ++missingNewlines;
         }
-        writeString(all);
+        totalSize += missingNewlines;
+
+        // Allocate once and memcpy all data into the buffer to avoid per-line overhead
+        buffer.clear();
+        buffer.resize(totalSize);
+        char* ptr = buffer.data();
+
+        for (const auto &line : lines) {
+            size_t len = line.size();
+            if (len > 0) {
+                std::memcpy(ptr, line.data(), len);
+                ptr += len;
+            }
+            if (len == 0 || line[len-1] != '\n') {
+                *ptr++ = '\n';
+            }
+        }
+
+        size_t written = SFIO_FWRITE(buffer.data(), 1, buffer.size(), file);
+        if (written != buffer.size())
+            throw std::runtime_error("Failed to write lines to '" + path + "'");
     }
 
     // Byte reader: optimized for binary input
@@ -226,11 +279,9 @@ namespace SimpleFileIO {
         if (!file)
             throw std::runtime_error("Failed to open file '" + path + "'");
 
-        // Allocate per-file 1 MB buffer
+        // Allocate per-file 1 MB buffer for manual reads
         buffer.resize(1 << 20);
-        if (std::setvbuf(file, buffer.data(), _IOFBF, buffer.size()) != 0) {
-            throw std::runtime_error("Failed to set file buffer for '" + path + "'");
-        }
+        // Do not use setvbuf() with our buffer here to avoid buffer aliasing with fread() calls
     }
 
     inline ByteReader::~ByteReader() {
@@ -259,7 +310,7 @@ namespace SimpleFileIO {
 
         std::vector<char> data(static_cast<size_t>(size));
         if (size > 0) {
-            size_t readBytes = std::fread(data.data(), 1, data.size(), file);
+            size_t readBytes = SFIO_FREAD(data.data(), 1, data.size(), file);
             if (readBytes != data.size())
                 throw std::runtime_error("Failed to read full file '" + path + "'");
         }
@@ -294,11 +345,10 @@ namespace SimpleFileIO {
         if (!file)
             throw std::runtime_error("Failed to open file '" + path + "'");
 
-        // Allocate per-file 1 MB buffer
+        // Allocate per-file 1 MB buffer for assembling write payloads
         buffer.resize(1 << 20);
-        if (std::setvbuf(file, buffer.data(), _IOFBF, buffer.size()) != 0) {
-            throw std::runtime_error("Failed to set file buffer for '" + path + "'");
-        }
+        // Do NOT pass this buffer to setvbuf(). Using the same memory for stdio's
+        // internal buffer and as our write source can cause corrupted output when reused.
     }
 
     inline ByteWriter::~ByteWriter() {
@@ -321,8 +371,14 @@ namespace SimpleFileIO {
     }
 
     inline void ByteWriter::writeBytes(const std::vector<char>& data) {
-        size_t written = std::fwrite(data.data(), 1, data.size(), file);
-        if (written != data.size())
-            throw std::runtime_error("Failed to write full data to '" + path + "'");
+        const size_t chunkSize = 1 << 20; // 1 MB
+        size_t offset = 0;
+        while (offset < data.size()) {
+            size_t toWrite = std::min(chunkSize, data.size() - offset);
+            size_t written = SFIO_FWRITE(data.data() + offset, 1, toWrite, file);
+            if (written != toWrite)
+                throw std::runtime_error("Failed to write full data to '" + path + "'");
+            offset += written;
+        }
     }
 }

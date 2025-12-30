@@ -56,11 +56,11 @@ Key features:
 
 ## Lifetime, Ownership & Errors
 
-- Each `File` object **owns its underlying file stream** (RAII).
+- Each **Reader/Writer** object **owns its underlying file stream** (RAII).
 - Files are opened on construction and **automatically closed on destruction**.
 - No manual cleanup is required; lifetime is scope-bound and deterministic.
 - File operation failures are reported via **exceptions** (no silent errors).
-- `File` instances are **not thread-safe**; concurrent access must be externally synchronized.
+- Reader/Writer instances are **not thread-safe**; concurrent access must be externally synchronized.
 
 ## Usage Examples
 
@@ -72,26 +72,26 @@ using namespace SimpleFileIO;
 
 ### Writing a single line
 ```cpp
-File writer("example.txt", OpenMode::Write);
+TextWriter writer("example.txt");
 writer.writeLine("Hello, SimpleFileIO!");
 ```
 
 ### Writing multiple lines
 ```cpp
-File writerMulti("example.txt", OpenMode::Write);
+TextWriter writerMulti("example.txt");
 writerMulti.writeLines({"Line 1", "Line 2", "Line 3"});
 ```
 
 ### Reading entire file content
 ```cpp
-File reader("example.txt", OpenMode::Read);
+TextReader reader("example.txt");
 std::string content = reader.readString();
 std::cout << content << "\n";
 ```
 
 ### Reading line by line
 ```cpp
-File readerLines("example.txt", OpenMode::Read);
+TextReader readerLines("example.txt");
 std::vector<std::string> lines = readerLines.readLines();
 for (auto& line : lines) {
     std::cout << line << '\n';
@@ -100,17 +100,17 @@ for (auto& line : lines) {
 
 ### Appending to an existing file
 ```cpp
-File appender("example.txt", OpenMode::Append);
+TextWriter appender("example.txt", true);
 appender.writeLine("This line is appended");
 ```
 
 ### Binary mode example
 ```cpp
-File binaryFile("data.bin", OpenMode::Write | OpenMode::Binary);
+ByteWriter binaryFile("data.bin");
 std::vector<char> binaryData = {0x01, 0x02, 0x03, (char)0xFF};
 binaryFile.writeBytes(binaryData);
 
-File binaryReader("data.bin", OpenMode::Read | OpenMode::Binary);
+ByteReader binaryReader("data.bin");
 std::vector<char> loadedData = binaryReader.readBytes();
 ```
 ---

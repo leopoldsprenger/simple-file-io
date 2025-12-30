@@ -17,7 +17,7 @@ void benchmark_simplefileio() {
     // writeString
     auto start = std::chrono::high_resolution_clock::now();
     {
-        File f(filename, OpenMode::Write);
+        TextWriter f(filename);
         f.writeString(data);
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -26,7 +26,7 @@ void benchmark_simplefileio() {
     // readString
     start = std::chrono::high_resolution_clock::now();
     {
-        File f(filename, OpenMode::Read);
+        TextReader f(filename);
         std::string content = f.readString();
     }
     end = std::chrono::high_resolution_clock::now();
@@ -35,7 +35,7 @@ void benchmark_simplefileio() {
     // writeBytes
     start = std::chrono::high_resolution_clock::now();
     {
-        File f(filename, OpenMode::Write | OpenMode::Binary);
+        ByteWriter f(filename);
         f.writeBytes(bytes);
     }
     end = std::chrono::high_resolution_clock::now();
@@ -44,7 +44,7 @@ void benchmark_simplefileio() {
     // readBytes
     start = std::chrono::high_resolution_clock::now();
     {
-        File f(filename, OpenMode::Read | OpenMode::Binary);
+        ByteReader f(filename);
         std::vector<char> content = f.readBytes();
     }
     end = std::chrono::high_resolution_clock::now();
@@ -54,7 +54,7 @@ void benchmark_simplefileio() {
     std::vector<std::string> lines(1'000'000, "x"); // 1 million lines
     start = std::chrono::high_resolution_clock::now();
     {
-        File f(filename, OpenMode::Write);
+        TextWriter f(filename);
         f.writeLines(lines);
     }
     end = std::chrono::high_resolution_clock::now();
@@ -63,7 +63,7 @@ void benchmark_simplefileio() {
     // readLines
     start = std::chrono::high_resolution_clock::now();
     {
-        File f(filename, OpenMode::Read);
+        TextReader f(filename);
         std::vector<std::string> read_lines = f.readLines();
     }
     end = std::chrono::high_resolution_clock::now();

@@ -72,7 +72,9 @@ TEST_CASE("Write line and read line (text)", "[File][Text]") {
         File fRead(textFile, OpenMode::Read);
         REQUIRE(fRead.readLine() == line1);
         REQUIRE(fRead.readLine() == line2);
-        REQUIRE_THROWS_AS(fRead.readLine(), std::out_of_range);
+
+        std::string eofLine;
+        REQUIRE_THROWS_AS( [&]{ eofLine = fRead.readLine(); }(), std::out_of_range );
     }
 }
 

@@ -29,14 +29,11 @@ namespace SimpleFileIO {
         inline TextReader(const std::string& path);
         inline ~TextReader();
 
-        inline bool isOpen() const;
         inline static bool exists(const std::string& path);
 
         inline std::string readString();
         inline std::string readLine();
         inline std::vector<std::string> readLines(int numLines = 0);
-
-        inline void flush();
 
     private:
         FILE* file = nullptr;
@@ -68,28 +65,17 @@ namespace SimpleFileIO {
         return std::filesystem::exists(path);
     }
 
-    inline bool TextReader::isOpen() const {
-        return file != nullptr;
-    }
-
-    inline void TextReader::flush() {
-        if (!file) return;
-        std::fflush(file);
-    }
-
     inline std::string TextReader::readString() {
-        std::fseek(file, 0, SEEK_END);
-        long size = std::ftell(file);
-        if (size < 0) throw std::runtime_error("Failed to determine file size");
-        std::fseek(file, 0, SEEK_SET);
+        if (!file) throw std::runtime_error("File not open");
 
-        std::string result(static_cast<size_t>(size), '\0');
-        if (size > 0) {
-            size_t readBytes = SFIO_FREAD(result.data(), 1, result.size(), file);
-            if (readBytes != result.size())
-                throw std::runtime_error("Failed to read full file '" + path + "'");
+        std::string result;
+        result.reserve(4 << 20); // start with 4 MB, grows dynamically if needed
+
+        while (true) {
+            size_t bytesRead = SFIO_FREAD(buffer.data(), 1, buffer.size(), file);
+            if (bytesRead == 0) break;
+            result.append(buffer.data(), bytesRead);
         }
-
         return result;
     }
 
@@ -150,7 +136,6 @@ namespace SimpleFileIO {
         inline TextWriter(const std::string& path, bool append = false);
         inline ~TextWriter();
 
-        inline bool isOpen() const;
         inline static bool exists(const std::string& path);
         inline void flush();
 
@@ -185,10 +170,6 @@ namespace SimpleFileIO {
 
     inline bool TextWriter::exists(const std::string& path) {
         return std::filesystem::exists(path);
-    }
-
-    inline bool TextWriter::isOpen() const {
-        return file != nullptr;
     }
 
     inline void TextWriter::flush() {
@@ -260,11 +241,9 @@ namespace SimpleFileIO {
         inline ByteReader(const std::string& path);
         inline ~ByteReader();
 
-        inline bool isOpen() const;
         inline static bool exists(const std::string& path);
 
         inline std::vector<char> readBytes();
-        inline void flush();
 
     private:
         FILE* file = nullptr;
@@ -293,26 +272,14 @@ namespace SimpleFileIO {
         return std::filesystem::exists(path);
     }
 
-    inline bool ByteReader::isOpen() const {
-        return file != nullptr;
-    }
-
-    inline void ByteReader::flush() {
-        if (!file) return;
-        std::fflush(file);
-    }
-
     inline std::vector<char> ByteReader::readBytes() {
-        std::fseek(file, 0, SEEK_END);
-        long size = std::ftell(file);
-        if (size < 0) throw std::runtime_error("Failed to determine file size");
-        std::fseek(file, 0, SEEK_SET);
+        std::vector<char> data;
+        data.reserve(4 << 20); // start with 4 MB, grows dynamically if needed
 
-        std::vector<char> data(static_cast<size_t>(size));
-        if (size > 0) {
-            size_t readBytes = SFIO_FREAD(data.data(), 1, data.size(), file);
-            if (readBytes != data.size())
-                throw std::runtime_error("Failed to read full file '" + path + "'");
+        while (true) {
+            size_t bytesRead = SFIO_FREAD(buffer.data(), 1, buffer.size(), file);
+            if (bytesRead == 0) break;
+            data.insert(data.end(), buffer.data(), buffer.data() + bytesRead);
         }
 
         return data;
@@ -324,7 +291,6 @@ namespace SimpleFileIO {
         inline ByteWriter(const std::string& path, bool append = false);
         inline ~ByteWriter();
 
-        inline bool isOpen() const;
         inline static bool exists(const std::string& path);
         inline void flush();
 
@@ -359,10 +325,6 @@ namespace SimpleFileIO {
 
     inline bool ByteWriter::exists(const std::string& path) {
         return std::filesystem::exists(path);
-    }
-
-    inline bool ByteWriter::isOpen() const {
-        return file != nullptr;
     }
 
     inline void ByteWriter::flush() {

@@ -18,7 +18,6 @@ TEST_CASE("File existence and open", "[File]") {
     REQUIRE_FALSE(TextWriter::exists(textFile));
 
     TextWriter fWrite(textFile);
-    REQUIRE(fWrite.isOpen());
 
     REQUIRE(TextWriter::exists(textFile));
 }

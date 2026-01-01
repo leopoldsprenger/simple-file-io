@@ -153,28 +153,28 @@ Benchmarking shows that SimpleFileIO is faster than Python for many common file 
 
 | Operation  | Mark | SFIO (ms) | vs Python | vs Raw File* |
 |-----------:|:----:|----------:|---------:|-------------:|
-| readString  | ✘ | 1.31 | -0.57 | +0.44 |
-| readLines   | ✘ | 4.16 | +0.83 | -18.16 |
-| readLine    | ✔ | 3.66 | -0.34 | -18.25 |
-| readBytes   | ✘ | 1.30 | +0.11 | +0.50 |
-| writeString | ✔ | 3.24 | -0.04 | +0.13 |
-| writeLines  | ✔ | 3.69 | -3.46 | +0.07 |
-| writeLine   | ✔ | 3.69 | -3.40 | +0.07 |
-| writeBytes  | ✔ | 3.17 | +0.02 | +0.00 |
+| readString  | ✔ | 0.76 | -1.10 | -0.61 |
+| readLines   | ✘ | 4.16 | +0.79 | -18.36 |
+| readLine    | ✔ | 3.64 | -0.36 | -18.43 |
+| readBytes   | ✔ | 0.77 | -0.41 | -0.58 |
+| writeString | ✔ | 3.16 | -0.12 | +0.06 |
+| writeLines  | ✔ | 3.63 | -3.27 | -0.10 |
+| writeLine   | ✔ | 3.63 | -3.43 | -0.10 |
+| writeBytes  | ✔ | 3.13 | +0.03 | +0.01 |
 
 > **Notes:**
-> - Negative numbers (e.g., -0.57) indicate that SimpleFileIO is faster than the comparison baseline (Python or Raw File*) by that many milliseconds.  
-> - Small positive numbers (e.g., +0.07) mean SFIO is marginally slower than the baseline; differences under a millisecond are typically within system noise.  
-> - “Mark” denotes whether the library was at least as fast as both Python and the raw FILE* implementation for that operation (✔) or not (✘).  
-> - Benchmarks were collected using the `bench/benchmark_all.cpp` and `bench/benchmark_python.py` scripts (median of multiple runs).  
+> - Negative numbers indicate SimpleFileIO is faster than the comparison baseline (Python or Raw File*) by that many milliseconds.  
+> - Small positive numbers mean SFIO is slightly slower; differences under 1 ms are usually system noise.  
+> - “Mark” denotes whether SFIO is at least as fast as both Python and Raw File* (✔) or not (✘).  
+> - Benchmarks collected using `bench/benchmark_all.cpp` and `bench/benchmark_python.py` (median of multiple runs).
 
 **Test details:**
 
-- **Dataset:** 10 MB total per test. For line-based operations each line is ~1 KB (≈10,000 lines).
-- **Runs & aggregation:** Each operation is executed **30 times** and the **median** timing is reported.
-- **Read behavior:** For `readString`, `readBytes`, `readLines`, and the repeated `readLine` loop, each timed iteration reads the entire 10 MB file; caches are dropped before each read run to force disk I/O.
-- **Write behavior:** Each write iteration is flushed and followed by `fsync` (so timings include durability costs and match Python's `os.fsync`).
-- **Reproducibility:** For consistent results run the benchmark on an otherwise idle machine and repeat the whole suite to estimate variance.
+- **Dataset:** 10 MB total per test. Line-based operations use ~1 KB per line (~10,000 lines).  
+- **Runs & aggregation:** Each operation executed 30 times; median timing reported.  
+- **Read behavior:** Reads (`readString`, `readBytes`, `readLines`, repeated `readLine`) read the full 10 MB file; caches dropped before each iteration.  
+- **Write behavior:** Writes flushed + `fsync` per iteration to match Python `os.fsync` behavior.  
+- **Reproducibility:** Run on idle machine; repeat suite to estimate variance.
 
 ---
 

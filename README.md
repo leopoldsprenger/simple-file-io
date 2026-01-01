@@ -147,26 +147,34 @@ add_executable(dummy main.cpp)
 
 ## Benchmarking
 
-Benchmarking shows that SimpleFileIO is faster than Python for many common file operations and nearly matches the speed of **Raw File*** (C `FILE*`-based I/O). It achieves this while remaining as easy to use as Python and requiring **no manual checks** thanks to its class-based, RAII API.
+Benchmarking shows that SimpleFileIO is faster than Python for many common file operations and closely matches the speed of **Raw File*** (C `FILE*`-based I/O) for the tested workloads. The benchmarks are performed using durable writes (fsync) and explicit cache-dropping for reads to ensure an apples-to-apples comparison.
 
 **Results (median timings / diffs):**
 
-| Operation  | SFIO (ms) | vs Python | vs Raw File* |
-|-----------:|----------:|---------:|-------------:|
-| readString  | ✔ 0.00 | -3.57  | -0.73  |
-| readLines   | ✔ 0.02 | -43.15 | -25.08 |
-| readLine    | ✔ 0.02 | -0.02  | -24.69 |
-| readBytes   | ✔ 0.02 | -2.42  | -0.71  |
-| writeString | ✘ 0.81 | -2.43  | +0.06  |
-| writeLines  | ✔ 8.11 | -42.19 | -13.38 |
-| writeLine   | ✘ 0.03 | -0.09  | +0.01  |
-| writeBytes  | ✘ 0.80 | -0.75  | +0.06  |
+| Operation  | Mark | SFIO (ms) | vs Python | vs Raw File* |
+|-----------:|:----:|----------:|---------:|-------------:|
+| readString  | ✘ | 1.31 | -0.57 | +0.44 |
+| readLines   | ✘ | 4.16 | +0.83 | -18.16 |
+| readLine    | ✔ | 3.66 | -0.34 | -18.25 |
+| readBytes   | ✘ | 1.30 | +0.11 | +0.50 |
+| writeString | ✔ | 3.24 | -0.04 | +0.13 |
+| writeLines  | ✔ | 3.69 | -3.46 | +0.07 |
+| writeLine   | ✔ | 3.69 | -3.40 | +0.07 |
+| writeBytes  | ✔ | 3.17 | +0.02 | +0.00 |
 
 > **Notes:**
-> - Negative numbers (e.g., -3.57) indicate that SimpleFileIO is faster than the comparison baseline (Python or Raw File*) by that many milliseconds.  
-> - Small positive numbers (e.g., +0.01) mean SFIO is marginally slower than the baseline, which is negligible and mostly due to OS-level caching behavior rather than library inefficiency.  
-> - “vs Raw File*” compares SFIO to raw FILE* I/O (fopen/fread/fwrite).  
-> - Benchmarks were collected using the `bench/benchmark_all.cpp` and `bench/benchmark_python.py` scripts (median of multiple runs).
+> - Negative numbers (e.g., -0.57) indicate that SimpleFileIO is faster than the comparison baseline (Python or Raw File*) by that many milliseconds.  
+> - Small positive numbers (e.g., +0.07) mean SFIO is marginally slower than the baseline; differences under a millisecond are typically within system noise.  
+> - “Mark” denotes whether the library was at least as fast as both Python and the raw FILE* implementation for that operation (✔) or not (✘).  
+> - Benchmarks were collected using the `bench/benchmark_all.cpp` and `bench/benchmark_python.py` scripts (median of multiple runs).  
+
+**Test details:**
+
+- **Dataset:** 10 MB total per test. For line-based operations each line is ~1 KB (≈10,000 lines).
+- **Runs & aggregation:** Each operation is executed **30 times** and the **median** timing is reported.
+- **Read behavior:** For `readString`, `readBytes`, `readLines`, and the repeated `readLine` loop, each timed iteration reads the entire 10 MB file; caches are dropped before each read run to force disk I/O.
+- **Write behavior:** Each write iteration is flushed and followed by `fsync` (so timings include durability costs and match Python's `os.fsync`).
+- **Reproducibility:** For consistent results run the benchmark on an otherwise idle machine and repeat the whole suite to estimate variance.
 
 ---
 

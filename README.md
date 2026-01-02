@@ -60,8 +60,11 @@ Key features:
 - Each **Reader/Writer** object **owns its underlying file stream** (RAII).
 - Files are opened on construction and **automatically closed on destruction**.
 - No manual cleanup is required; lifetime is scope-bound and deterministic.
-- File operation failures are reported via **exceptions** (no silent errors).
+- File operation failures are reported via **exceptions** (no silent errors), except for EOF:
+  - `readLine()` returns an empty string at EOF instead of throwing.
+  - `readLines()` stops at EOF; no exception is thrown for end-of-file.
 - Reader/Writer instances are **not thread-safe**; concurrent access must be externally synchronized.
+- Writers automatically flush their buffers on destruction.
 
 ## Usage Examples
 
@@ -151,21 +154,22 @@ Benchmarking shows that SimpleFileIO is faster than Python for many common file 
 
 **Results (median timings / diffs):**
 
-| Operation  | Mark | SFIO (ms) | vs Python | vs Raw File* |
-|-----------:|:----:|----------:|---------:|-------------:|
-| readString  | ✔ | 0.76 | -1.10 | -0.61 |
-| readLines   | ✘ | 4.16 | +0.79 | -18.36 |
-| readLine    | ✔ | 3.64 | -0.36 | -18.43 |
-| readBytes   | ✔ | 0.77 | -0.41 | -0.58 |
-| writeString | ✔ | 3.16 | -0.12 | +0.06 |
-| writeLines  | ✔ | 3.63 | -3.27 | -0.10 |
-| writeLine   | ✔ | 3.63 | -3.43 | -0.10 |
-| writeBytes  | ✔ | 3.13 | +0.03 | +0.01 |
+| Operation   | Mark | SFIO (ms) | vs Python | vs Raw File* |
+|------------:|:----:|-----------:|----------:|-------------:|
+| readString  | ✔    | 0.80       | -1.10     | -0.27        |
+| readLines   | ✘    | 4.15       | +0.83     | -18.62       |
+| readLine    | ✔    | 3.69       | -0.25     | -18.69       |
+| readBytes   | ✔    | 0.84       | -0.38     | -0.07        |
+| writeString | ✔    | 3.18       | -0.11     | +0.07        |
+| writeLines  | ✔    | 3.79       | -1.39     | +0.16        |
+| writeLine   | ✔    | 3.79       | -1.38     | +0.16        |
+| writeBytes  | ✔    | 3.17       | -0.01     | +0.01        |
 
 > **Notes:**
 > - Negative numbers indicate SimpleFileIO is faster than the comparison baseline (Python or Raw File*) by that many milliseconds.  
 > - Small positive numbers mean SFIO is slightly slower; differences under 1 ms are usually system noise.  
 > - “Mark” denotes whether SFIO is at least as fast as both Python and Raw File* (✔) or not (✘).  
+> Core library is cross-platform and header-only. Benchmark optimizations may use OS-specific calls (e.g., `fwrite_unlocked`, `posix_fadvise`).
 > - Benchmarks collected using `bench/benchmark_all.cpp` and `bench/benchmark_python.py` (median of multiple runs).
 
 **Test details:**

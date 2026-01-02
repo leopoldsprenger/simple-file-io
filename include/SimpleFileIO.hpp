@@ -23,6 +23,52 @@
 #endif
 
 namespace SimpleFileIO {
+    // Enums of all possible error types
+    enum class IOError {
+        FileNotOpen,
+        FileNotFound,
+        PermissionDenied,
+        ReadError,
+        WriteError
+    };
+
+    // Generall class for exceptions
+    class IOException : public std::runtime_error {
+    public:
+        IOError code;
+        std::string detail;
+        std::string path;
+
+        IOException(IOError code,
+                    std::string message,
+                    std::string path = "")
+            : std::runtime_error(std::move(message)),
+            code(code),
+            path(std::move(path)) {}
+    };
+
+    // Translate error code into readable messages
+    inline std::string formatIOError(IOError code,
+                                    const std::string& path = "",
+                                    const std::string& detail = "") {
+        switch (code) {
+            case IOError::FileNotOpen:
+                return "File operation failed 'file is not open': " + path;
+            case IOError::FileNotFound:
+                return "File not found: " + path;
+            case IOError::PermissionDenied:
+                return "Permission denied while accessing: " + path;
+            case IOError::ReadError:
+                return "Low-level read error" + 
+                        (detail.empty() ? "" : (": " + detail));
+            case IOError::WriteError:
+                return "Low-level write error" + 
+                        (detail.empty() ? "" : (": " + detail));
+            default:
+                return "Unknown I/O error.";
+        }
+    }
+
     // Text reader: optimized for text input
     class TextReader {
     public:
@@ -49,8 +95,20 @@ namespace SimpleFileIO {
     {
         // Open the file in text read mode
         file = std::fopen(path.c_str(), "r");
-        if (!file)
-            throw std::runtime_error("Failed to open file '" + path + "'");
+        if (!file) {
+            IOError code;
+            switch (errno) {
+                case ENOENT: // No such file or directory
+                    code = IOError::FileNotFound;
+                    break;
+                case EACCES: // Permission denied
+                    code = IOError::PermissionDenied;
+                    break;
+                default:
+                    code = IOError::FileNotOpen;
+            }
+            throw IOException(code, formatIOError(code, path), path);
+        }
 
         // Allocate per-file 1 MB buffer for manual buffered reads
         buffer.resize(1 << 20);
@@ -66,22 +124,30 @@ namespace SimpleFileIO {
     }
 
     inline std::string TextReader::readString() {
-        if (!file) throw std::runtime_error("File not open");
+        if (!file) 
+            throw IOException(IOError::FileNotOpen, formatIOError(IOError::FileNotOpen, path), path);
 
         std::string result;
         result.reserve(4 << 20); // start with 4 MB, grows dynamically if needed
 
         while (true) {
             size_t bytesRead = SFIO_FREAD(buffer.data(), 1, buffer.size(), file);
-            if (bytesRead == 0) break;
+            if (bytesRead == 0) {
+                if (ferror(file))
+                    throw IOException(IOError::ReadError, formatIOError(IOError::ReadError, path), path);
+                break;
+            }
             result.append(buffer.data(), bytesRead);
         }
         return result;
     }
 
     inline std::string TextReader::readLine() {
-        if (!file) throw std::runtime_error("File not open");
+        if (!file) 
+            throw IOException(IOError::FileNotOpen, formatIOError(IOError::FileNotOpen, path), path);
+
         std::string line;
+        bool anyDataRead = false;
 
         while (true) {
             if (cursor >= bufferEnd) {
@@ -91,26 +157,31 @@ namespace SimpleFileIO {
                     std::memmove(buffer.data(), buffer.data() + cursor, leftover);
                 }
                 size_t bytesRead = SFIO_FREAD(buffer.data() + leftover, 1, buffer.size() - leftover, file);
-                if (bytesRead == 0) {
-                    if (line.empty()) throw std::out_of_range("End of file reached");
-                    break;
-                }
                 cursor = 0;
                 bufferEnd = leftover + bytesRead;
+
+                if (bytesRead == 0) {
+                    if (ferror(file))
+                        throw IOException(IOError::ReadError, formatIOError(IOError::ReadError, path), path);
+                    break; // normal EOF
+                }
             }
 
-            // find newline
             size_t start = cursor;
             while (cursor < bufferEnd && buffer[cursor] != '\n') cursor++;
-
-            line.append(buffer.data() + start, cursor - start);
+            if (cursor > start) {
+                line.append(buffer.data() + start, cursor - start);
+                anyDataRead = true;
+            }
 
             if (cursor < bufferEnd && buffer[cursor] == '\n') {
                 cursor++; // skip newline
                 break;
             }
-            // continue loop if newline not found
         }
+
+        if (!anyDataRead && std::feof(file))
+            return {}; // EOF reached, return empty string without throwing
 
         return line;
     }
@@ -119,12 +190,10 @@ namespace SimpleFileIO {
         std::vector<std::string> lines;
         if (numLines > 0) lines.reserve(numLines);
 
-        try {
-            while (numLines == 0 || lines.size() < static_cast<size_t>(numLines)) {
-                lines.push_back(readLine());
-            }
-        } catch (const std::out_of_range&) {
-            // Reached EOF - fail silently
+        while (numLines == 0 || lines.size() < static_cast<size_t>(numLines)) {
+            std::string line = readLine();
+            if (line.empty() && std::feof(file)) break; // stop at EOF
+            lines.push_back(std::move(line));
         }
 
         return lines;
@@ -156,7 +225,7 @@ namespace SimpleFileIO {
         const char* modeStr = append ? "a" : "w";
         file = std::fopen(path.c_str(), modeStr);
         if (!file)
-            throw std::runtime_error("Failed to open file '" + path + "'");
+            throw IOException(IOError::FileNotOpen, formatIOError(IOError::FileNotOpen, path), path);
 
         // Allocate per-file 1 MB buffer for assembling write payloads
         buffer.resize(1 << 20);
@@ -185,24 +254,27 @@ namespace SimpleFileIO {
             size_t toWrite = std::min(chunkSize, data.size() - offset);
             size_t written = SFIO_FWRITE(data.data() + offset, 1, toWrite, file);
             if (written != toWrite)
-                throw std::runtime_error("Failed to write full string to '" + path + "'");
+                throw IOException(IOError::WriteError, formatIOError(IOError::WriteError, path, "Failed to write string to file."), path);
             offset += written;
         }
     }
 
     inline void TextWriter::writeLine(const std::string& line) {
-        if (!file) throw std::runtime_error("File not open");
+        if (!file)
+            throw IOException(IOError::FileNotOpen, formatIOError(IOError::FileNotOpen, path), path);
+
         // Use single preallocated buffer per TextWriter
         buffer.clear();
         buffer.insert(buffer.end(), line.begin(), line.end());
         buffer.push_back('\n');
         size_t written = SFIO_FWRITE(buffer.data(), 1, buffer.size(), file);
         if (written != buffer.size())
-            throw std::runtime_error("Failed to write line to '" + path + "'");
+            throw IOException(IOError::WriteError, formatIOError(IOError::WriteError, path, "Failed to write line to file."), path);
     }
 
     inline void TextWriter::writeLines(const std::vector<std::string>& lines) {
-        if (!file) throw std::runtime_error("File not open");
+        if (!file)
+            throw IOException(IOError::FileNotOpen, formatIOError(IOError::FileNotOpen, path), path);
         if (lines.empty()) return;
 
         // Compute total size: sum of line sizes + missing newlines for lines that don't end with '\n'
@@ -232,7 +304,7 @@ namespace SimpleFileIO {
 
         size_t written = SFIO_FWRITE(buffer.data(), 1, buffer.size(), file);
         if (written != buffer.size())
-            throw std::runtime_error("Failed to write lines to '" + path + "'");
+            throw IOException(IOError::WriteError, formatIOError(IOError::WriteError, path, "Failed to write lines to file."), path);
     }
 
     // Byte reader: optimized for binary input
@@ -256,7 +328,7 @@ namespace SimpleFileIO {
     {
         file = std::fopen(path.c_str(), "rb");
         if (!file)
-            throw std::runtime_error("Failed to open file '" + path + "'");
+            throw IOException(IOError::FileNotOpen, formatIOError(IOError::FileNotOpen, path), path);
 
         // Allocate per-file 1 MB buffer for manual reads
         buffer.resize(1 << 20);
@@ -278,7 +350,11 @@ namespace SimpleFileIO {
 
         while (true) {
             size_t bytesRead = SFIO_FREAD(buffer.data(), 1, buffer.size(), file);
-            if (bytesRead == 0) break;
+            if (bytesRead == 0) {
+                if (ferror(file))
+                    throw IOException(IOError::ReadError, formatIOError(IOError::ReadError, path), path);
+                break;
+            }
             data.insert(data.end(), buffer.data(), buffer.data() + bytesRead);
         }
 
@@ -309,7 +385,7 @@ namespace SimpleFileIO {
         const char* modeStr = append ? "ab" : "wb";
         file = std::fopen(path.c_str(), modeStr);
         if (!file)
-            throw std::runtime_error("Failed to open file '" + path + "'");
+            throw IOException(IOError::FileNotOpen, formatIOError(IOError::FileNotOpen, path), path);
 
         // Allocate per-file 1 MB buffer for assembling write payloads
         buffer.resize(1 << 20);
@@ -339,7 +415,7 @@ namespace SimpleFileIO {
             size_t toWrite = std::min(chunkSize, data.size() - offset);
             size_t written = SFIO_FWRITE(data.data() + offset, 1, toWrite, file);
             if (written != toWrite)
-                throw std::runtime_error("Failed to write full data to '" + path + "'");
+                throw IOException(IOError::WriteError, formatIOError(IOError::WriteError, path, "Failed to write bytes to file."), path);
             offset += written;
         }
     }

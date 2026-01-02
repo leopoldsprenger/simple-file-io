@@ -172,18 +172,18 @@ int main() {
         readBytes = reader.readBytes();
     }, 30, [&]{ drop_cache(filename); });
 
-    libTimes["readLines"] = timeFuncMedian([&]{
-        TextReader reader(filename);
-        auto v = reader.readLines();
-    }, 30, [&]{ drop_cache(filename); });
-
     libTimes["readLine"] = timeFuncMedian([&]{
         TextReader reader(filename);
         while (true) {
-            try {
-                singleLine = reader.readLine();
-            } catch (const std::out_of_range&) { break; }
+            std::string line = reader.readLine();
+            if (line.empty()) break;  // EOF reached
+            singleLine = std::move(line);
         }
+    }, 30, [&]{ drop_cache(filename); });
+
+    libTimes["readLines"] = timeFuncMedian([&]{
+        TextReader reader(filename);
+        auto v = reader.readLines();  // readLines already stops at EOF
     }, 30, [&]{ drop_cache(filename); });
 
     // ---------------- Raw benchmarks ----------------

@@ -72,8 +72,9 @@ TEST_CASE("Write line and read line (text)", "[File][Text]") {
         REQUIRE(fRead.readLine() == line1);
         REQUIRE(fRead.readLine() == line2);
 
-        std::string eofLine;
-        REQUIRE_THROWS_AS( [&]{ eofLine = fRead.readLine(); }(), std::out_of_range );
+        // No exception on EOF anymore, just returns empty string
+        std::string eofLine = fRead.readLine();
+        REQUIRE(eofLine.empty());
     }
 }
 
@@ -121,5 +122,10 @@ TEST_CASE("Binary write and read bytes", "[File][Binary]") {
 
 TEST_CASE("Reader on missing file throws", "[File]") {
     removeFile(textFile);
-    REQUIRE_THROWS_AS(TextReader(textFile), std::runtime_error);
+    try {
+        TextReader fRead(textFile);
+        FAIL("Expected IOException for FileNotFound");
+    } catch (const IOException& e) {
+        REQUIRE(e.code == IOError::FileNotFound);
+    }
 }

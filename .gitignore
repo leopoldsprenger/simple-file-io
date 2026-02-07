@@ -30,3 +30,6 @@ compile_commands.json
 
 # Windows
 Thumbs.db
+
+# Ignore docs
+docs/

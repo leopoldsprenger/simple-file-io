@@ -1,0 +1,52 @@
+# Project info
+PROJECT_NAME           = SimpleFileIO
+PROJECT_BRIEF          = Fast, lightweight C++ file I/O utilities
+
+# Input
+INPUT                  = .
+FILE_PATTERNS          = *.h *.hpp *.cpp
+RECURSIVE              = YES
+
+# What to extract
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+
+# Documentation style
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+BUILTIN_STL_SUPPORT    = YES
+
+# Warnings (highly recommended)
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = YES
+
+# Output
+GENERATE_HTML          = YES
+HTML_OUTPUT            = docs
+GENERATE_LATEX         = NO
+
+# Diagrams
+HAVE_DOT               = YES
+CLASS_DIAGRAMS         = YES
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+
+USE_MDFILE_AS_MAINPAGE = README.md
+WARN_AS_ERROR = FAIL_ON_WARNINGS
+ALIASES += "complexity=@par Complexity:"
+
+# Use Awesome theme
+HTML_EXTRA_STYLESHEET  = docs/doxygen-awesome/doxygen-awesome.css
+
+# Better layout
+GENERATE_TREEVIEW     = YES
+FULL_SIDEBAR          = YES
+
+# Cleaner output
+HTML_COLORSTYLE       = LIGHT
+HTML_DYNAMIC_MENUS    = YES
+
+# Better grouping & UX
+SORT_GROUP_NAMES      = YES
+SORT_MEMBER_DOCS      = YES

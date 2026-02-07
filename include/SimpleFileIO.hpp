@@ -13,17 +13,48 @@
 #include <filesystem>
 #include <algorithm>
 
-// Wrapper macros for portable fast I/O
-#if defined(__linux__)
-#define SFIO_FWRITE fwrite_unlocked
-#define SFIO_FREAD  fread_unlocked
-#else
-#define SFIO_FWRITE std::fwrite
-#define SFIO_FREAD  std::fread
-#endif
+/**
+ * @defgroup Core Core Utilities
+ * @brief Error handling and shared utilities.
+ */
 
+/**
+ * @defgroup TextIO Text File I/O
+ * @brief High-performance text file readers and writers.
+ */
+
+/**
+ * @defgroup BinaryIO Binary File I/O
+ * @brief High-performance binary file readers and writers.
+ */
+
+/**
+ * @namespace SimpleFileIO
+ * @brief Lightweight, fast, cross-platform file I/O utilities.
+ *
+ * @ingroup Core
+ *
+ * Provides optimized text and binary readers/writers with explicit buffering,
+ * portable fast I/O wrappers, and structured error handling via exceptions.
+ *
+ * @note All classes use manual 1 MB buffers to reduce syscall overhead.
+ * @warning These utilities are not thread-safe on the same file instance.
+ */
 namespace SimpleFileIO {
-    // Enums of all possible error types
+    // Wrapper macros for portable fast I/O
+    #if defined(__linux__)
+    #define SFIO_FWRITE fwrite_unlocked
+    #define SFIO_FREAD  fread_unlocked
+    #else
+    #define SFIO_FWRITE std::fwrite
+    #define SFIO_FREAD  std::fread
+    #endif
+
+    /**
+     * @ingroup Core
+     * @enum IOError
+     * @brief Enumerates all supported I/O error categories.
+     */
     enum class IOError {
         FileNotOpen,
         FileNotFound,
@@ -32,13 +63,27 @@ namespace SimpleFileIO {
         WriteError
     };
 
-    // Generall class for exceptions
+    
+    /**
+     * @ingroup Core
+     * @class IOException
+     * @brief Exception type thrown for all file I/O failures.
+     *
+     * Wraps a high-level error code, optional path information,
+     * and a human-readable message.
+     */
     class IOException : public std::runtime_error {
     public:
         IOError code;
         std::string detail;
         std::string path;
 
+        
+        /**
+         * @param code    Error category
+         * @param message Human-readable error description
+         * @param path    Optional file path
+         */
         IOException(IOError code,
                     std::string message,
                     std::string path = "")
@@ -47,7 +92,16 @@ namespace SimpleFileIO {
             path(std::move(path)) {}
     };
 
-    // Translate error code into readable messages
+
+    /**
+     * @ingroup Core
+     * @brief Converts an IOError into a readable error message.
+     *
+     * @param code   Error category
+     * @param path   Optional file path related to the error
+     * @param detail Optional low-level detail string
+     * @return Formatted error message
+     */
     inline std::string formatIOError(IOError code,
                                     const std::string& path = "",
                                     const std::string& detail = "") {
@@ -69,16 +123,73 @@ namespace SimpleFileIO {
         }
     }
 
-    // Text reader: optimized for text input
+    /**
+     * @ingroup TextIO
+     * @class TextReader
+     * @brief High-performance buffered text file reader.
+     *
+     * Optimized for sequential access using a manual 1 MB buffer.
+     *
+     * @note Newlines are normalized as-is; no CRLF conversion is performed.
+     */
     class TextReader {
     public:
+        /**
+         * @brief Opens a text file for reading.
+         * @param path Path to the file
+         * @throws IOException if the file cannot be opened
+         */
         inline TextReader(const std::string& path);
+        
+        /**
+         * @brief Closes the file and releases resources.
+         */
         inline ~TextReader();
 
+        /**
+         * @brief Checks whether a file exists.
+         * @param path Path to the file
+         * @return True if the file exists
+         */
         inline static bool exists(const std::string& path);
 
+        /**
+         * @brief Reads the entire file into a string.
+         *
+         * @return String containing all file contents
+         *
+         * @throws IOException on read failure
+         *
+         * @complexity Time: O(n)  
+         * @complexity Space: O(n)
+         */
         inline std::string readString();
+        
+        /**
+         * @brief Reads a single line from the file.
+         *
+         * The returned string does not include the trailing newline.
+         *
+         * @return The next line, or an empty string on EOF
+         *
+         * @throws IOException on read failure
+         *
+         * @complexity Amortized O(k), where k is line length
+         */
         inline std::string readLine();
+
+        /**
+         * @brief Reads multiple lines from the file.
+         *
+         * @param numLines Maximum number of lines to read.
+         *                 If zero, reads until EOF.
+         * @return Vector containing the read lines
+         *
+         * @throws IOException on read failure
+         *
+         * @complexity Time: O(n)  
+         * @complexity Space: O(n)
+         */
         inline std::vector<std::string> readLines(int numLines = 0);
 
     private:
@@ -199,17 +310,64 @@ namespace SimpleFileIO {
         return lines;
     }
 
-    // Text writer: optimized for text output
+    /**
+     * @ingroup TextIO
+     * @class TextWriter
+     * @brief High-performance buffered text file writer.
+     *
+     * Uses chunked writes and a reusable internal buffer to minimize
+     * syscall overhead.
+     */
     class TextWriter {
     public:
+        /**
+         * @brief Opens a text file for writing.
+         * @param path   File path
+         * @param append Append instead of overwrite
+         * @throws IOException if the file cannot be opened
+         */
         inline TextWriter(const std::string& path, bool append = false);
+
+        /**
+         * @brief Flushes buffers and closes the file.
+         */
         inline ~TextWriter();
 
+        /**
+         * @brief Checks whether a file exists.
+         */
         inline static bool exists(const std::string& path);
+        
+        /**
+         * @brief Flushes buffered output to disk.
+         */
         inline void flush();
 
+        /**
+         * @brief Writes a raw string to the file.
+         *
+         * @complexity Time: O(n)  
+         * @complexity Space: O(1)
+         *
+         * @throws IOException on write failure
+         */
         inline void writeString(const std::string& data);
+        
+        /**
+         * @brief Writes a single line with a trailing newline.
+         *
+         * @throws IOException on write failure
+         */
         inline void writeLine(const std::string& line);
+        
+        /**
+         * @brief Writes multiple lines to the file.
+         *
+         * @complexity Time: O(n)  
+         * @complexity Space: O(n)
+         *
+         * @throws IOException on write failure
+         */
         inline void writeLines(const std::vector<std::string>& lines);
 
     private:
@@ -307,14 +465,61 @@ namespace SimpleFileIO {
             throw IOException(IOError::WriteError, formatIOError(IOError::WriteError, path, "Failed to write lines to file."), path);
     }
 
-    // Byte reader: optimized for binary input
+    /**
+     * @ingroup BinaryIO
+     * @class ByteReader
+     * @brief High-performance binary file reader.
+     *
+     * Provides efficient sequential access to raw bytes using a manually
+     * managed 1 MB buffer to minimize system call overhead.
+     *
+     * @note Intended for large, contiguous binary reads.
+     * @warning Not safe for concurrent access from multiple threads.
+     */
     class ByteReader {
     public:
+        /**
+         * @brief Opens a binary file for reading.
+         *
+         * @param path Path to the file
+         *
+         * @throws IOException if the file cannot be opened
+         *         (e.g., file does not exist or permission is denied)
+         *
+         * @note The file is opened in binary mode ("rb").
+         */
         inline ByteReader(const std::string& path);
+
+        /**
+         * @brief Closes the file and releases all associated resources.
+         *
+         * @note Automatically closes the underlying FILE handle.
+         */
         inline ~ByteReader();
 
+        /**
+         * @brief Checks whether a file exists.
+         *
+         * @param path Path to the file
+         * @return True if the file exists, false otherwise
+         *
+         * @note This function does not verify read permissions.
+         */
         inline static bool exists(const std::string& path);
 
+        /**
+         * @brief Reads the entire file into a byte buffer.
+         *
+         * @return Vector containing all bytes read from the file
+         *
+         * @throws IOException on low-level read failure
+         *
+         * @complexity Time: O(n)  
+         * @complexity Space: O(n)
+         *
+         * @note The returned vector grows dynamically as needed.
+         * @warning Large files will be fully loaded into memory.
+         */
         inline std::vector<char> readBytes();
 
     private:
@@ -361,15 +566,69 @@ namespace SimpleFileIO {
         return data;
     }
 
-    // Byte writer: optimized for binary output
+    /**
+     * @ingroup BinaryIO
+     * @class ByteWriter
+     * @brief High-performance binary file writer.
+     *
+     * Writes raw byte buffers efficiently using chunked I/O to avoid
+     * excessive memory usage and system calls.
+     *
+     * @note Uses chunked writes for large buffers.
+     * @warning Not safe for concurrent access from multiple threads.
+     */
     class ByteWriter {
     public:
+        /**
+         * @brief Opens a binary file for writing.
+         *
+         * @param path   Path to the file
+         * @param append If true, appends to the file instead of overwriting
+         *
+         * @throws IOException if the file cannot be opened
+         *
+         * @note The file is opened in binary mode ("wb" or "ab").
+         */
         inline ByteWriter(const std::string& path, bool append = false);
+
+        /**
+         * @brief Flushes buffered output and closes the file.
+         *
+         * @note Destructor ensures that all pending data is flushed to disk.
+         */
         inline ~ByteWriter();
 
+        /**
+         * @brief Checks whether a file exists.
+         *
+         * @param path Path to the file
+         * @return True if the file exists, false otherwise
+         */
         inline static bool exists(const std::string& path);
+
+        /**
+         * @brief Flushes any buffered output to disk.
+         *
+         * @throws IOException on flush failure
+         *
+         * @note This does not close the file.
+         */
         inline void flush();
 
+        /**
+         * @brief Writes a byte buffer to the file.
+         *
+         * Performs chunked writes to safely handle very large buffers.
+         *
+         * @param data Byte buffer to write
+         *
+         * @throws IOException on write failure
+         *
+         * @complexity Time: O(n)  
+         * @complexity Space: O(1)
+         *
+         * @warning Partial writes result in an exception; no retry is attempted.
+         */
         inline void writeBytes(const std::vector<char>& data);
 
     private:
@@ -390,7 +649,7 @@ namespace SimpleFileIO {
         // Allocate per-file 1 MB buffer for assembling write payloads
         buffer.resize(1 << 20);
         // Do NOT pass this buffer to setvbuf(). Using the same memory for stdio's
-        // internal buffer and as our write source can cause corrupted output when reused.
+        // internal buffer and as the write source can cause corrupted output when reused.
     }
 
     inline ByteWriter::~ByteWriter() {

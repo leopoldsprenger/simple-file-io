@@ -1,10 +1,5 @@
 var SimpleFileIO_8hpp =
 [
-    [ "SimpleFileIO::IOException", "classSimpleFileIO_1_1IOException.html", "classSimpleFileIO_1_1IOException" ],
-    [ "SimpleFileIO::TextReader", "classSimpleFileIO_1_1TextReader.html", "classSimpleFileIO_1_1TextReader" ],
-    [ "SimpleFileIO::TextWriter", "classSimpleFileIO_1_1TextWriter.html", "classSimpleFileIO_1_1TextWriter" ],
-    [ "SimpleFileIO::ByteReader", "classSimpleFileIO_1_1ByteReader.html", "classSimpleFileIO_1_1ByteReader" ],
-    [ "SimpleFileIO::ByteWriter", "classSimpleFileIO_1_1ByteWriter.html", "classSimpleFileIO_1_1ByteWriter" ],
     [ "SFIO_FREAD", "SimpleFileIO_8hpp.html#a70f01defd70c967f98490c1a4d890712", null ],
     [ "SFIO_FWRITE", "SimpleFileIO_8hpp.html#a7128323dde01e2b2260674cc91d20f34", null ],
     [ "IOError", "SimpleFileIO_8hpp.html#a660354cd186cf18efa162b063d654555", [
@@ -14,5 +9,5 @@ var SimpleFileIO_8hpp =
       [ "ReadError", "SimpleFileIO_8hpp.html#a660354cd186cf18efa162b063d654555adf9be6f7af7c3f7196c5c3e731de0a87", null ],
       [ "WriteError", "SimpleFileIO_8hpp.html#a660354cd186cf18efa162b063d654555a4a02ea49d454392fd1e3426e53f14b58", null ]
     ] ],
-    [ "formatIOError", "SimpleFileIO_8hpp.html#abbfc649f601590458910cb8e4370a339", null ]
+    [ "formatIOError", "SimpleFileIO_8hpp.html#gabbfc649f601590458910cb8e4370a339", null ]
 ];

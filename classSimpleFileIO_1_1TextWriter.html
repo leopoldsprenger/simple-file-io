@@ -95,33 +95,46 @@ $(document).ready(function(){initNavTree('classSimpleFileIO_1_1TextWriter.html',
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classSimpleFileIO_1_1TextWriter-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">SimpleFileIO::TextWriter Class Reference</div></div>
+  <div class="headertitle"><div class="title">SimpleFileIO::TextWriter Class Reference<div class="ingroups"><a class="el" href="group__TextIO.html">Text File I/O</a></div></div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>High-performance buffered text file writer.  
+ <a href="classSimpleFileIO_1_1TextWriter.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="SimpleFileIO_8hpp_source.html">SimpleFileIO.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a49317f69e750ba68e29a6cf88788c9ed" id="r_a49317f69e750ba68e29a6cf88788c9ed"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextWriter.html#a49317f69e750ba68e29a6cf88788c9ed">TextWriter</a> (const std::string &amp;path, bool append=false)</td></tr>
+<tr class="memdesc:a49317f69e750ba68e29a6cf88788c9ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a text file for writing.  <br /></td></tr>
 <tr class="separator:a49317f69e750ba68e29a6cf88788c9ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f72e9ee35ff299e36dff22a613cef81" id="r_a3f72e9ee35ff299e36dff22a613cef81"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextWriter.html#a3f72e9ee35ff299e36dff22a613cef81">~TextWriter</a> ()</td></tr>
+<tr class="memdesc:a3f72e9ee35ff299e36dff22a613cef81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flushes buffers and closes the file.  <br /></td></tr>
 <tr class="separator:a3f72e9ee35ff299e36dff22a613cef81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe728c8464ca3e5d558f69dd0f6727a9" id="r_afe728c8464ca3e5d558f69dd0f6727a9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextWriter.html#afe728c8464ca3e5d558f69dd0f6727a9">flush</a> ()</td></tr>
+<tr class="memdesc:afe728c8464ca3e5d558f69dd0f6727a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flushes buffered output to disk.  <br /></td></tr>
 <tr class="separator:afe728c8464ca3e5d558f69dd0f6727a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b51f40f44e86d7eb251686c139180eb" id="r_a6b51f40f44e86d7eb251686c139180eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextWriter.html#a6b51f40f44e86d7eb251686c139180eb">writeString</a> (const std::string &amp;data)</td></tr>
+<tr class="memdesc:a6b51f40f44e86d7eb251686c139180eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a raw string to the file.  <br /></td></tr>
 <tr class="separator:a6b51f40f44e86d7eb251686c139180eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef7b9a664f49a93e3aeb9c51e30144ab" id="r_aef7b9a664f49a93e3aeb9c51e30144ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextWriter.html#aef7b9a664f49a93e3aeb9c51e30144ab">writeLine</a> (const std::string &amp;line)</td></tr>
+<tr class="memdesc:aef7b9a664f49a93e3aeb9c51e30144ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a single line with a trailing newline.  <br /></td></tr>
 <tr class="separator:aef7b9a664f49a93e3aeb9c51e30144ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b3cfe10e97f41048cb26c2df496591e" id="r_a4b3cfe10e97f41048cb26c2df496591e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextWriter.html#a4b3cfe10e97f41048cb26c2df496591e">writeLines</a> (const std::vector&lt; std::string &gt; &amp;lines)</td></tr>
+<tr class="memdesc:a4b3cfe10e97f41048cb26c2df496591e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes multiple lines to the file.  <br /></td></tr>
 <tr class="separator:a4b3cfe10e97f41048cb26c2df496591e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae916abbd92b59863e96b99afd8fd503e" id="r_ae916abbd92b59863e96b99afd8fd503e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextWriter.html#ae916abbd92b59863e96b99afd8fd503e">exists</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:ae916abbd92b59863e96b99afd8fd503e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether a file exists.  <br /></td></tr>
 <tr class="separator:ae916abbd92b59863e96b99afd8fd503e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>High-performance buffered text file writer. </p>
+<p>Uses chunked writes and a reusable internal buffer to minimize syscall overhead. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a49317f69e750ba68e29a6cf88788c9ed" name="a49317f69e750ba68e29a6cf88788c9ed"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a49317f69e750ba68e29a6cf88788c9ed">&#9670;&#160;</a></span>TextWriter()</h2>
 
@@ -156,6 +169,21 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Opens a text file for writing. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>File path </td></tr>
+    <tr><td class="paramname">append</td><td>Append instead of overwrite </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>if the file cannot be opened </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a3f72e9ee35ff299e36dff22a613cef81" name="a3f72e9ee35ff299e36dff22a613cef81"></a>
@@ -180,6 +208,8 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Flushes buffers and closes the file. </p>
 
 </div>
 </div>
@@ -208,6 +238,8 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Checks whether a file exists. </p>
+
 </div>
 </div>
 <a id="afe728c8464ca3e5d558f69dd0f6727a9" name="afe728c8464ca3e5d558f69dd0f6727a9"></a>
@@ -232,6 +264,8 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Flushes buffered output to disk. </p>
 
 </div>
 </div>
@@ -259,6 +293,14 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Writes a single line with a trailing newline. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on write failure </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a4b3cfe10e97f41048cb26c2df496591e" name="a4b3cfe10e97f41048cb26c2df496591e"></a>
@@ -285,6 +327,16 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Writes multiple lines to the file. </p>
+<dl class="section user"><dt>Complexity: Time: O(n) </dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity: Space: O(n)</dt><dd></dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on write failure </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a6b51f40f44e86d7eb251686c139180eb" name="a6b51f40f44e86d7eb251686c139180eb"></a>
@@ -310,6 +362,16 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Writes a raw string to the file. </p>
+<dl class="section user"><dt>Complexity: Time: O(n) </dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity: Space: O(1)</dt><dd></dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on write failure </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

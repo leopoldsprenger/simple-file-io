@@ -95,27 +95,39 @@ $(document).ready(function(){initNavTree('classSimpleFileIO_1_1ByteReader.html',
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classSimpleFileIO_1_1ByteReader-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">SimpleFileIO::ByteReader Class Reference</div></div>
+  <div class="headertitle"><div class="title">SimpleFileIO::ByteReader Class Reference<div class="ingroups"><a class="el" href="group__BinaryIO.html">Binary File I/O</a></div></div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>High-performance binary file reader.  
+ <a href="classSimpleFileIO_1_1ByteReader.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="SimpleFileIO_8hpp_source.html">SimpleFileIO.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:acc72fdbde2552f6e9075536fd07351cb" id="r_acc72fdbde2552f6e9075536fd07351cb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteReader.html#acc72fdbde2552f6e9075536fd07351cb">ByteReader</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:acc72fdbde2552f6e9075536fd07351cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a binary file for reading.  <br /></td></tr>
 <tr class="separator:acc72fdbde2552f6e9075536fd07351cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a973d34440370b0346aae76c6ced510ce" id="r_a973d34440370b0346aae76c6ced510ce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteReader.html#a973d34440370b0346aae76c6ced510ce">~ByteReader</a> ()</td></tr>
+<tr class="memdesc:a973d34440370b0346aae76c6ced510ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the file and releases all associated resources.  <br /></td></tr>
 <tr class="separator:a973d34440370b0346aae76c6ced510ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb9130affd879183a24a1b7b1e19bec2" id="r_afb9130affd879183a24a1b7b1e19bec2"><td class="memItemLeft" align="right" valign="top">std::vector&lt; char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteReader.html#afb9130affd879183a24a1b7b1e19bec2">readBytes</a> ()</td></tr>
+<tr class="memdesc:afb9130affd879183a24a1b7b1e19bec2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the entire file into a byte buffer.  <br /></td></tr>
 <tr class="separator:afb9130affd879183a24a1b7b1e19bec2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a001ecc3322ea70b308c3739652edb74f" id="r_a001ecc3322ea70b308c3739652edb74f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteReader.html#a001ecc3322ea70b308c3739652edb74f">exists</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:a001ecc3322ea70b308c3739652edb74f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether a file exists.  <br /></td></tr>
 <tr class="separator:a001ecc3322ea70b308c3739652edb74f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>High-performance binary file reader. </p>
+<p>Provides efficient sequential access to raw bytes using a manually managed 1 MB buffer to minimize system call overhead.</p>
+<dl class="section note"><dt>Note</dt><dd>Intended for large, contiguous binary reads. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Not safe for concurrent access from multiple threads. </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="acc72fdbde2552f6e9075536fd07351cb" name="acc72fdbde2552f6e9075536fd07351cb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acc72fdbde2552f6e9075536fd07351cb">&#9670;&#160;</a></span>ByteReader()</h2>
 
@@ -139,6 +151,21 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Opens a binary file for reading. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>Path to the file</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>if the file cannot be opened (e.g., file does not exist or permission is denied)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>The file is opened in binary mode ("rb"). </dd></dl>
 
 </div>
 </div>
@@ -164,6 +191,9 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Closes the file and releases all associated resources. </p>
+<dl class="section note"><dt>Note</dt><dd>Automatically closes the underlying FILE handle. </dd></dl>
 
 </div>
 </div>
@@ -192,6 +222,16 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Checks whether a file exists. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>Path to the file </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the file exists, false otherwise</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This function does not verify read permissions. </dd></dl>
+
 </div>
 </div>
 <a id="afb9130affd879183a24a1b7b1e19bec2" name="afb9130affd879183a24a1b7b1e19bec2"></a>
@@ -216,6 +256,19 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Reads the entire file into a byte buffer. </p>
+<dl class="section return"><dt>Returns</dt><dd>Vector containing all bytes read from the file</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on low-level read failure</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Complexity: Time: O(n) </dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity: Space: O(n)</dt><dd></dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The returned vector grows dynamically as needed. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Large files will be fully loaded into memory. </dd></dl>
 
 </div>
 </div>

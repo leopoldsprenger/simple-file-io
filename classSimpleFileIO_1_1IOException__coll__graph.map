@@ -1,5 +1,5 @@
 <map id="SimpleFileIO::IOException" name="SimpleFileIO::IOException">
-<area shape="rect" id="Node000001" title=" " alt="" coords="47,197,238,223"/>
+<area shape="rect" id="Node000001" title="Exception type thrown for all file I/O failures." alt="" coords="47,197,238,223"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,95,144,120"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,130,137,196,133,199,88,133"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="13,13,128,38"/>

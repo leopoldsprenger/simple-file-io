@@ -12,5 +12,5 @@ var namespaceSimpleFileIO =
       [ "ReadError", "namespaceSimpleFileIO.html#a660354cd186cf18efa162b063d654555adf9be6f7af7c3f7196c5c3e731de0a87", null ],
       [ "WriteError", "namespaceSimpleFileIO.html#a660354cd186cf18efa162b063d654555a4a02ea49d454392fd1e3426e53f14b58", null ]
     ] ],
-    [ "formatIOError", "namespaceSimpleFileIO.html#abbfc649f601590458910cb8e4370a339", null ]
+    [ "formatIOError", "group__Core.html#gabbfc649f601590458910cb8e4370a339", null ]
 ];

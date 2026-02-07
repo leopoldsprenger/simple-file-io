@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title"><a class="el" href="namespaceSimpleFileIO.html">SimpleFileIO</a> </div></div>
+  <div class="headertitle"><div class="title"><a class="el" href="namespaceSimpleFileIO.html" title="Lightweight, fast, cross-platform file I/O utilities.">SimpleFileIO</a> </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_README"></a> <img src="https://img.shields.io/badge/C%2B%2B-23-blue" alt="C++" class="inline"/> <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" style="pointer-events: none;" class="inline"/></p>
@@ -117,7 +117,7 @@ Index</h1>
 <hr  />
 <h1><a class="anchor" id="autotoc_md4"></a>
 Overview</h1>
-<p><code><a class="el" href="namespaceSimpleFileIO.html">SimpleFileIO</a></code> is a lightweight, modern, header-only C++ library that abstracts common file operations into a clean, safe, and easy-to-use interface. Its API is <b>inspired by Python’s intuitive file handling semantics</b> (e.g., <code>file = open(...)</code>), combining readability with modern C++ safety and performance. It targets developers who need reliable file handling without the boilerplate of standard C++ streams. <br  />
+<p><code><a class="el" href="namespaceSimpleFileIO.html" title="Lightweight, fast, cross-platform file I/O utilities.">SimpleFileIO</a></code> is a lightweight, modern, header-only C++ library that abstracts common file operations into a clean, safe, and easy-to-use interface. Its API is <b>inspired by Python’s intuitive file handling semantics</b> (e.g., <code>file = open(...)</code>), combining readability with modern C++ safety and performance. It targets developers who need reliable file handling without the boilerplate of standard C++ streams. <br  />
 </p>
 <p>Key features:</p>
 <ul>
@@ -183,12 +183,12 @@ Include the library</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="SimpleFileIO_8hpp.html">SimpleFileIO.hpp</a>&quot;</span></div>
 <div class="line"><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespaceSimpleFileIO.html">SimpleFileIO</a>;</div>
 <div class="ttc" id="aSimpleFileIO_8hpp_html"><div class="ttname"><a href="SimpleFileIO_8hpp.html">SimpleFileIO.hpp</a></div></div>
-<div class="ttc" id="anamespaceSimpleFileIO_html"><div class="ttname"><a href="namespaceSimpleFileIO.html">SimpleFileIO</a></div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:25</div></div>
+<div class="ttc" id="anamespaceSimpleFileIO_html"><div class="ttname"><a href="namespaceSimpleFileIO.html">SimpleFileIO</a></div><div class="ttdoc">Lightweight, fast, cross-platform file I/O utilities.</div></div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md13"></a>
 Writing a single line</h2>
 <div class="fragment"><div class="line"><a class="code hl_class" href="classSimpleFileIO_1_1TextWriter.html">TextWriter</a> writer(<span class="stringliteral">&quot;example.txt&quot;</span>);</div>
 <div class="line">writer.writeLine(<span class="stringliteral">&quot;Hello, SimpleFileIO!&quot;</span>);</div>
-<div class="ttc" id="aclassSimpleFileIO_1_1TextWriter_html"><div class="ttname"><a href="classSimpleFileIO_1_1TextWriter.html">SimpleFileIO::TextWriter</a></div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:203</div></div>
+<div class="ttc" id="aclassSimpleFileIO_1_1TextWriter_html"><div class="ttname"><a href="classSimpleFileIO_1_1TextWriter.html">SimpleFileIO::TextWriter</a></div><div class="ttdoc">High-performance buffered text file writer.</div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:321</div></div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md14"></a>
 Writing multiple lines</h2>
 <div class="fragment"><div class="line"><a class="code hl_class" href="classSimpleFileIO_1_1TextWriter.html">TextWriter</a> writerMulti(<span class="stringliteral">&quot;example.txt&quot;</span>);</div>
@@ -198,7 +198,7 @@ Reading entire file content</h2>
 <div class="fragment"><div class="line"><a class="code hl_class" href="classSimpleFileIO_1_1TextReader.html">TextReader</a> reader(<span class="stringliteral">&quot;example.txt&quot;</span>);</div>
 <div class="line">std::string content = reader.readString();</div>
 <div class="line">std::cout &lt;&lt; content &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="ttc" id="aclassSimpleFileIO_1_1TextReader_html"><div class="ttname"><a href="classSimpleFileIO_1_1TextReader.html">SimpleFileIO::TextReader</a></div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:73</div></div>
+<div class="ttc" id="aclassSimpleFileIO_1_1TextReader_html"><div class="ttname"><a href="classSimpleFileIO_1_1TextReader.html">SimpleFileIO::TextReader</a></div><div class="ttdoc">High-performance buffered text file reader.</div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:135</div></div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md16"></a>
 Reading line by line</h2>
 <div class="fragment"><div class="line"><a class="code hl_class" href="classSimpleFileIO_1_1TextReader.html">TextReader</a> readerLines(<span class="stringliteral">&quot;example.txt&quot;</span>);</div>
@@ -218,13 +218,13 @@ Binary mode example</h2>
 <div class="line"> </div>
 <div class="line"><a class="code hl_class" href="classSimpleFileIO_1_1ByteReader.html">ByteReader</a> binaryReader(<span class="stringliteral">&quot;data.bin&quot;</span>);</div>
 <div class="line">std::vector&lt;char&gt; loadedData = binaryReader.readBytes();</div>
-<div class="ttc" id="aclassSimpleFileIO_1_1ByteReader_html"><div class="ttname"><a href="classSimpleFileIO_1_1ByteReader.html">SimpleFileIO::ByteReader</a></div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:311</div></div>
-<div class="ttc" id="aclassSimpleFileIO_1_1ByteWriter_html"><div class="ttname"><a href="classSimpleFileIO_1_1ByteWriter.html">SimpleFileIO::ByteWriter</a></div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:365</div></div>
+<div class="ttc" id="aclassSimpleFileIO_1_1ByteReader_html"><div class="ttname"><a href="classSimpleFileIO_1_1ByteReader.html">SimpleFileIO::ByteReader</a></div><div class="ttdoc">High-performance binary file reader.</div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:479</div></div>
+<div class="ttc" id="aclassSimpleFileIO_1_1ByteWriter_html"><div class="ttname"><a href="classSimpleFileIO_1_1ByteWriter.html">SimpleFileIO::ByteWriter</a></div><div class="ttdoc">High-performance binary file writer.</div><div class="ttdef"><b>Definition</b> SimpleFileIO.hpp:580</div></div>
 <div class="ttc" id="atest__file_8cpp_html_a0515404fd7cb097e926a46f9008f2cb1"><div class="ttname"><a href="test__file_8cpp.html#a0515404fd7cb097e926a46f9008f2cb1">binaryFile</a></div><div class="ttdeci">const std::string binaryFile</div><div class="ttdef"><b>Definition</b> test_file.cpp:9</div></div>
 </div><!-- fragment --> <hr  />
 <h1><a class="anchor" id="autotoc_md20"></a>
 Integration &amp; Build</h1>
-<p>Being <b>header-only</b>, <code><a class="el" href="namespaceSimpleFileIO.html">SimpleFileIO</a></code> requires no separate build step. <br  />
+<p>Being <b>header-only</b>, <code><a class="el" href="namespaceSimpleFileIO.html" title="Lightweight, fast, cross-platform file I/O utilities.">SimpleFileIO</a></code> requires no separate build step. <br  />
 </p>
 <p><b>Steps to integrate</b>:</p>
 <ol type="1">
@@ -247,7 +247,7 @@ Integration &amp; Build</h1>
 </ol>
 <h1><a class="anchor" id="autotoc_md22"></a>
 Benchmarking</h1>
-<p>Benchmarking shows that <a class="el" href="namespaceSimpleFileIO.html">SimpleFileIO</a> is faster than Python for many common file operations and closely matches the speed of **Raw File*** (C <code>FILE*</code>-based I/O) for the tested workloads. The benchmarks are performed using durable writes (fsync) and explicit cache-dropping for reads to ensure an apples-to-apples comparison.</p>
+<p>Benchmarking shows that <a class="el" href="namespaceSimpleFileIO.html" title="Lightweight, fast, cross-platform file I/O utilities.">SimpleFileIO</a> is faster than Python for many common file operations and closely matches the speed of **Raw File*** (C <code>FILE*</code>-based I/O) for the tested workloads. The benchmarks are performed using durable writes (fsync) and explicit cache-dropping for reads to ensure an apples-to-apples comparison.</p>
 <p><b>Results (median timings / diffs):</b></p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -271,7 +271,7 @@ Benchmarking</h1>
 </table>
 <blockquote class="doxtable">
 <p>&zwj;<b>Notes:</b></p><ul>
-<li>Negative numbers indicate <a class="el" href="namespaceSimpleFileIO.html">SimpleFileIO</a> is faster than the comparison baseline (Python or Raw File*) by that many milliseconds. <br  />
+<li>Negative numbers indicate <a class="el" href="namespaceSimpleFileIO.html" title="Lightweight, fast, cross-platform file I/O utilities.">SimpleFileIO</a> is faster than the comparison baseline (Python or Raw File*) by that many milliseconds. <br  />
 </li>
 <li>Small positive numbers mean SFIO is slightly slower; differences under 1 ms are usually system noise. <br  />
 </li>

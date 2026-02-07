@@ -95,31 +95,44 @@ $(document).ready(function(){initNavTree('classSimpleFileIO_1_1TextReader.html',
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classSimpleFileIO_1_1TextReader-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">SimpleFileIO::TextReader Class Reference</div></div>
+  <div class="headertitle"><div class="title">SimpleFileIO::TextReader Class Reference<div class="ingroups"><a class="el" href="group__TextIO.html">Text File I/O</a></div></div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>High-performance buffered text file reader.  
+ <a href="classSimpleFileIO_1_1TextReader.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="SimpleFileIO_8hpp_source.html">SimpleFileIO.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:abc4d551405fef91b4e52ab7f3be28899" id="r_abc4d551405fef91b4e52ab7f3be28899"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextReader.html#abc4d551405fef91b4e52ab7f3be28899">TextReader</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:abc4d551405fef91b4e52ab7f3be28899"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a text file for reading.  <br /></td></tr>
 <tr class="separator:abc4d551405fef91b4e52ab7f3be28899"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a18bd36ec16c4e5b41ad5f45e86473842" id="r_a18bd36ec16c4e5b41ad5f45e86473842"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextReader.html#a18bd36ec16c4e5b41ad5f45e86473842">~TextReader</a> ()</td></tr>
+<tr class="memdesc:a18bd36ec16c4e5b41ad5f45e86473842"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the file and releases resources.  <br /></td></tr>
 <tr class="separator:a18bd36ec16c4e5b41ad5f45e86473842"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad91a861a4ff9b0771f01e6ca40241207" id="r_ad91a861a4ff9b0771f01e6ca40241207"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextReader.html#ad91a861a4ff9b0771f01e6ca40241207">readString</a> ()</td></tr>
+<tr class="memdesc:ad91a861a4ff9b0771f01e6ca40241207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the entire file into a string.  <br /></td></tr>
 <tr class="separator:ad91a861a4ff9b0771f01e6ca40241207"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a477a15126b62ead8a3353e79b1b7ad6f" id="r_a477a15126b62ead8a3353e79b1b7ad6f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextReader.html#a477a15126b62ead8a3353e79b1b7ad6f">readLine</a> ()</td></tr>
+<tr class="memdesc:a477a15126b62ead8a3353e79b1b7ad6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a single line from the file.  <br /></td></tr>
 <tr class="separator:a477a15126b62ead8a3353e79b1b7ad6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2f772dac44e07d73c691a9fbeeac667" id="r_ac2f772dac44e07d73c691a9fbeeac667"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextReader.html#ac2f772dac44e07d73c691a9fbeeac667">readLines</a> (int numLines=0)</td></tr>
+<tr class="memdesc:ac2f772dac44e07d73c691a9fbeeac667"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads multiple lines from the file.  <br /></td></tr>
 <tr class="separator:ac2f772dac44e07d73c691a9fbeeac667"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a81440f6033d48f7e5274616bc7b60552" id="r_a81440f6033d48f7e5274616bc7b60552"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextReader.html#a81440f6033d48f7e5274616bc7b60552">exists</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:a81440f6033d48f7e5274616bc7b60552"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether a file exists.  <br /></td></tr>
 <tr class="separator:a81440f6033d48f7e5274616bc7b60552"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>High-performance buffered text file reader. </p>
+<p>Optimized for sequential access using a manual 1 MB buffer.</p>
+<dl class="section note"><dt>Note</dt><dd>Newlines are normalized as-is; no CRLF conversion is performed. </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abc4d551405fef91b4e52ab7f3be28899" name="abc4d551405fef91b4e52ab7f3be28899"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abc4d551405fef91b4e52ab7f3be28899">&#9670;&#160;</a></span>TextReader()</h2>
 
@@ -143,6 +156,20 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Opens a text file for reading. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>Path to the file </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>if the file cannot be opened </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -168,6 +195,8 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Closes the file and releases resources. </p>
 
 </div>
 </div>
@@ -196,6 +225,15 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Checks whether a file exists. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>Path to the file </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the file exists </dd></dl>
+
 </div>
 </div>
 <a id="a477a15126b62ead8a3353e79b1b7ad6f" name="a477a15126b62ead8a3353e79b1b7ad6f"></a>
@@ -220,6 +258,17 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Reads a single line from the file. </p>
+<p>The returned string does not include the trailing newline.</p>
+<dl class="section return"><dt>Returns</dt><dd>The next line, or an empty string on EOF</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on read failure</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Complexity: Amortized O(k), where k is line length</dt><dd></dd></dl>
 
 </div>
 </div>
@@ -247,6 +296,23 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Reads multiple lines from the file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">numLines</td><td>Maximum number of lines to read. If zero, reads until EOF. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Vector containing the read lines</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on read failure</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Complexity: Time: O(n) </dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity: Space: O(n)</dt><dd></dd></dl>
+
 </div>
 </div>
 <a id="ad91a861a4ff9b0771f01e6ca40241207" name="ad91a861a4ff9b0771f01e6ca40241207"></a>
@@ -271,6 +337,17 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Reads the entire file into a string. </p>
+<dl class="section return"><dt>Returns</dt><dd>String containing all file contents</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on read failure</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Complexity: Time: O(n) </dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity: Space: O(n)</dt><dd></dd></dl>
 
 </div>
 </div>

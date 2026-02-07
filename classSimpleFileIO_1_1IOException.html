@@ -95,9 +95,12 @@ $(document).ready(function(){initNavTree('classSimpleFileIO_1_1IOException.html'
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="classSimpleFileIO_1_1IOException-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">SimpleFileIO::IOException Class Reference</div></div>
+  <div class="headertitle"><div class="title">SimpleFileIO::IOException Class Reference<div class="ingroups"><a class="el" href="group__Core.html">Core Utilities</a></div></div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Exception type thrown for all file I/O failures.  
+ <a href="classSimpleFileIO_1_1IOException.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="SimpleFileIO_8hpp_source.html">SimpleFileIO.hpp</a>&gt;</code></p>
 <div class="dynheader">
@@ -105,7 +108,7 @@ Inheritance diagram for SimpleFileIO::IOException:</div>
 <div class="dyncontent">
 <div class="center"><img src="classSimpleFileIO_1_1IOException__inherit__graph.png" border="0" usemap="#aSimpleFileIO_1_1IOException_inherit__map" alt="Inheritance graph"/></div>
 <map name="aSimpleFileIO_1_1IOException_inherit__map" id="aSimpleFileIO_1_1IOException_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,152,196,177"/>
+<area shape="rect" title="Exception type thrown for all file I/O failures." alt="" coords="5,152,196,177"/>
 <area shape="rect" title=" " alt="" coords="31,79,170,104"/>
 <area shape="poly" title=" " alt="" coords="103,118,103,152,98,152,98,118"/>
 <area shape="rect" title=" " alt="" coords="43,5,158,31"/>
@@ -117,7 +120,7 @@ Collaboration diagram for SimpleFileIO::IOException:</div>
 <div class="dyncontent">
 <div class="center"><img src="classSimpleFileIO_1_1IOException__coll__graph.png" border="0" usemap="#aSimpleFileIO_1_1IOException_coll__map" alt="Collaboration graph"/></div>
 <map name="aSimpleFileIO_1_1IOException_coll__map" id="aSimpleFileIO_1_1IOException_coll__map">
-<area shape="rect" title=" " alt="" coords="47,197,238,223"/>
+<area shape="rect" title="Exception type thrown for all file I/O failures." alt="" coords="47,197,238,223"/>
 <area shape="rect" title=" " alt="" coords="5,95,144,120"/>
 <area shape="poly" title=" " alt="" coords="92,130,137,196,133,199,88,133"/>
 <area shape="rect" title=" " alt="" coords="13,13,128,38"/>
@@ -143,7 +146,10 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ac200e75478d81dbf83aa54980615b9b8" id="r_ac200e75478d81dbf83aa54980615b9b8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1IOException.html#ac200e75478d81dbf83aa54980615b9b8">path</a></td></tr>
 <tr class="separator:ac200e75478d81dbf83aa54980615b9b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Exception type thrown for all file I/O failures. </p>
+<p>Wraps a high-level error code, optional path information, and a human-readable message. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0d364c035dffd105b4130d0c076af9ab" name="a0d364c035dffd105b4130d0c076af9ab"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0d364c035dffd105b4130d0c076af9ab">&#9670;&#160;</a></span>IOException()</h2>
 
@@ -183,6 +189,14 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">code</td><td>Error category </td></tr>
+    <tr><td class="paramname">message</td><td>Human-readable error description </td></tr>
+    <tr><td class="paramname">path</td><td>Optional file path </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

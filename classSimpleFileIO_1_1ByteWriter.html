@@ -95,29 +95,42 @@ $(document).ready(function(){initNavTree('classSimpleFileIO_1_1ByteWriter.html',
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classSimpleFileIO_1_1ByteWriter-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">SimpleFileIO::ByteWriter Class Reference</div></div>
+  <div class="headertitle"><div class="title">SimpleFileIO::ByteWriter Class Reference<div class="ingroups"><a class="el" href="group__BinaryIO.html">Binary File I/O</a></div></div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>High-performance binary file writer.  
+ <a href="classSimpleFileIO_1_1ByteWriter.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="SimpleFileIO_8hpp_source.html">SimpleFileIO.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a4e77b53319971f632cd551567f654516" id="r_a4e77b53319971f632cd551567f654516"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteWriter.html#a4e77b53319971f632cd551567f654516">ByteWriter</a> (const std::string &amp;path, bool append=false)</td></tr>
+<tr class="memdesc:a4e77b53319971f632cd551567f654516"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a binary file for writing.  <br /></td></tr>
 <tr class="separator:a4e77b53319971f632cd551567f654516"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb897326efcf953c494e277313bbf32a" id="r_abb897326efcf953c494e277313bbf32a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteWriter.html#abb897326efcf953c494e277313bbf32a">~ByteWriter</a> ()</td></tr>
+<tr class="memdesc:abb897326efcf953c494e277313bbf32a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flushes buffered output and closes the file.  <br /></td></tr>
 <tr class="separator:abb897326efcf953c494e277313bbf32a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99db1141afeba9861303fcb10dc324e8" id="r_a99db1141afeba9861303fcb10dc324e8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteWriter.html#a99db1141afeba9861303fcb10dc324e8">flush</a> ()</td></tr>
+<tr class="memdesc:a99db1141afeba9861303fcb10dc324e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flushes any buffered output to disk.  <br /></td></tr>
 <tr class="separator:a99db1141afeba9861303fcb10dc324e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8630321608e8024683b345f51851969d" id="r_a8630321608e8024683b345f51851969d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteWriter.html#a8630321608e8024683b345f51851969d">writeBytes</a> (const std::vector&lt; char &gt; &amp;data)</td></tr>
+<tr class="memdesc:a8630321608e8024683b345f51851969d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a byte buffer to the file.  <br /></td></tr>
 <tr class="separator:a8630321608e8024683b345f51851969d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:afa580f28a25cddbba398c696d7c5cc38" id="r_afa580f28a25cddbba398c696d7c5cc38"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteWriter.html#afa580f28a25cddbba398c696d7c5cc38">exists</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:afa580f28a25cddbba398c696d7c5cc38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether a file exists.  <br /></td></tr>
 <tr class="separator:afa580f28a25cddbba398c696d7c5cc38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>High-performance binary file writer. </p>
+<p>Writes raw byte buffers efficiently using chunked I/O to avoid excessive memory usage and system calls.</p>
+<dl class="section note"><dt>Note</dt><dd>Uses chunked writes for large buffers. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Not safe for concurrent access from multiple threads. </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4e77b53319971f632cd551567f654516" name="a4e77b53319971f632cd551567f654516"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4e77b53319971f632cd551567f654516">&#9670;&#160;</a></span>ByteWriter()</h2>
 
@@ -152,6 +165,22 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Opens a binary file for writing. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>Path to the file </td></tr>
+    <tr><td class="paramname">append</td><td>If true, appends to the file instead of overwriting</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>if the file cannot be opened</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>The file is opened in binary mode ("wb" or "ab"). </dd></dl>
+
 </div>
 </div>
 <a id="abb897326efcf953c494e277313bbf32a" name="abb897326efcf953c494e277313bbf32a"></a>
@@ -176,6 +205,9 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Flushes buffered output and closes the file. </p>
+<dl class="section note"><dt>Note</dt><dd>Destructor ensures that all pending data is flushed to disk. </dd></dl>
 
 </div>
 </div>
@@ -204,6 +236,15 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Checks whether a file exists. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>Path to the file </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the file exists, false otherwise </dd></dl>
+
 </div>
 </div>
 <a id="a99db1141afeba9861303fcb10dc324e8" name="a99db1141afeba9861303fcb10dc324e8"></a>
@@ -228,6 +269,15 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Flushes any buffered output to disk. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on flush failure</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This does not close the file. </dd></dl>
 
 </div>
 </div>
@@ -254,6 +304,24 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Writes a byte buffer to the file. </p>
+<p>Performs chunked writes to safely handle very large buffers.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>Byte buffer to write</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classSimpleFileIO_1_1IOException.html" title="Exception type thrown for all file I/O failures.">IOException</a></td><td>on write failure</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Complexity: Time: O(n) </dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity: Space: O(1)</dt><dd></dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Partial writes result in an exception; no retry is attempted. </dd></dl>
 
 </div>
 </div>

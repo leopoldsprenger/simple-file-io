@@ -42,6 +42,7 @@ var NAVTREE =
     [ "Integration & Build", "index.html#autotoc_md20", null ],
     [ "Benchmarking", "index.html#autotoc_md22", null ],
     [ "License", "index.html#autotoc_md24", null ],
+    [ "Topics", "topics.html", "topics" ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [

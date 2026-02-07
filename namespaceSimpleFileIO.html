@@ -95,21 +95,29 @@ $(document).ready(function(){initNavTree('namespaceSimpleFileIO.html',''); initR
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
-  <div class="headertitle"><div class="title">SimpleFileIO Namespace Reference</div></div>
+  <div class="headertitle"><div class="title">SimpleFileIO Namespace Reference<div class="ingroups"><a class="el" href="group__Core.html">Core Utilities</a></div></div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Lightweight, fast, cross-platform file I/O utilities.  
+<a href="namespaceSimpleFileIO.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteReader.html">ByteReader</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-performance binary file reader.  <a href="classSimpleFileIO_1_1ByteReader.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1ByteWriter.html">ByteWriter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-performance binary file writer.  <a href="classSimpleFileIO_1_1ByteWriter.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1IOException.html">IOException</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exception type thrown for all file I/O failures.  <a href="classSimpleFileIO_1_1IOException.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextReader.html">TextReader</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-performance buffered text file reader.  <a href="classSimpleFileIO_1_1TextReader.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSimpleFileIO_1_1TextWriter.html">TextWriter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-performance buffered text file writer.  <a href="classSimpleFileIO_1_1TextWriter.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
@@ -127,10 +135,16 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:abbfc649f601590458910cb8e4370a339" id="r_abbfc649f601590458910cb8e4370a339"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceSimpleFileIO.html#abbfc649f601590458910cb8e4370a339">formatIOError</a> (<a class="el" href="namespaceSimpleFileIO.html#a660354cd186cf18efa162b063d654555">IOError</a> code, const std::string &amp;path=&quot;&quot;, const std::string &amp;detail=&quot;&quot;)</td></tr>
-<tr class="separator:abbfc649f601590458910cb8e4370a339"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabbfc649f601590458910cb8e4370a339" id="r_gabbfc649f601590458910cb8e4370a339"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Core.html#gabbfc649f601590458910cb8e4370a339">formatIOError</a> (<a class="el" href="namespaceSimpleFileIO.html#a660354cd186cf18efa162b063d654555">IOError</a> code, const std::string &amp;path=&quot;&quot;, const std::string &amp;detail=&quot;&quot;)</td></tr>
+<tr class="memdesc:gabbfc649f601590458910cb8e4370a339"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an IOError into a readable error message.  <br /></td></tr>
+<tr class="separator:gabbfc649f601590458910cb8e4370a339"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Lightweight, fast, cross-platform file I/O utilities. </p>
+<p>Provides optimized text and binary readers/writers with explicit buffering, portable fast I/O wrappers, and structured error handling via exceptions.</p>
+<dl class="section note"><dt>Note</dt><dd>All classes use manual 1 MB buffers to reduce syscall overhead. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>These utilities are not thread-safe on the same file instance. </dd></dl>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="a660354cd186cf18efa162b063d654555" name="a660354cd186cf18efa162b063d654555"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a660354cd186cf18efa162b063d654555">&#9670;&#160;</a></span>IOError</h2>
 
@@ -157,49 +171,6 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a660354cd186cf18efa162b063d654555adf9be6f7af7c3f7196c5c3e731de0a87" name="a660354cd186cf18efa162b063d654555adf9be6f7af7c3f7196c5c3e731de0a87"></a>ReadError&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a660354cd186cf18efa162b063d654555a4a02ea49d454392fd1e3426e53f14b58" name="a660354cd186cf18efa162b063d654555a4a02ea49d454392fd1e3426e53f14b58"></a>WriteError&#160;</td><td class="fielddoc"></td></tr>
 </table>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="abbfc649f601590458910cb8e4370a339" name="abbfc649f601590458910cb8e4370a339"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbfc649f601590458910cb8e4370a339">&#9670;&#160;</a></span>formatIOError()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string SimpleFileIO::formatIOError </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="namespaceSimpleFileIO.html#a660354cd186cf18efa162b063d654555">IOError</a>&#160;</td>
-          <td class="paramname"><em>code</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>path</em> = <code>&quot;&quot;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>detail</em> = <code>&quot;&quot;</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 </div>
 </div>

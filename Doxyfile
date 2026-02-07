@@ -3,7 +3,7 @@ PROJECT_NAME           = SimpleFileIO
 PROJECT_BRIEF          = Fast, lightweight C++ file I/O utilities
 
 # Input
-INPUT                  = .
+INPUT                  = include bench tests README.md
 FILE_PATTERNS          = *.h *.hpp *.cpp
 RECURSIVE              = YES
 
@@ -37,7 +37,7 @@ WARN_AS_ERROR = FAIL_ON_WARNINGS
 ALIASES += "complexity=@par Complexity:"
 
 # Use Awesome theme
-HTML_EXTRA_STYLESHEET  = docs/doxygen-awesome/doxygen-awesome.css
+HTML_EXTRA_STYLESHEET  = third_party/doxygen-awesome/doxygen-awesome.css
 
 # Better layout
 GENERATE_TREEVIEW     = YES

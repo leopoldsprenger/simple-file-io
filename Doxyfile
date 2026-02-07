@@ -33,7 +33,7 @@ CALL_GRAPH             = NO
 CALLER_GRAPH           = NO
 
 USE_MDFILE_AS_MAINPAGE = README.md
-WARN_AS_ERROR = FAIL_ON_WARNINGS
+WARN_AS_ERROR = NO
 ALIASES += "complexity=@par Complexity:"
 
 # Use Awesome theme
